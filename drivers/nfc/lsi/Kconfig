@@ -1,15 +1,6 @@
 #
 # Near Field Communication (NFC) devices
 #
-config SAMSUNG_NFC
-	tristate "Samsung NFC driver for module build"
-	default n
-	help
-	  Say Y here if you want to build support for NFC (Near field
-	  communication) devices.
-	  To compile this support as a module, choose M here: the module will
-	  be called nfc.
-
 config SEC_NFC
 	tristate "Samsung NFC driver"
 	default n
@@ -90,15 +81,6 @@ config ESE_FACTORY_ONLY
 	  Oberthur Driver.
 	  This driver provides support for LSI NXP combined ESE products.
 	  You should select your NFC product and interface.
-
-config SEC_NFC_LOGGER
-	bool "NFC logger"
-	default n
-	help
-	  Enable NFC log.
-	  NFC log will be recorded at proc folder.
-	  but will not included at dumpstate log.
-	  so need to copy this file to log folder.
 
 config SEC_NFC_DUPLICATED_IRQ_WQ_LSI
 	bool "NFC duplicated irq wq lsi"
