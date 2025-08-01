@@ -32,5 +32,5 @@ nanohub-$(CONFIG_SENSORS_SSP) += ssp_dev.o ssp_i2c.o ssp_data.o ssp_sysfs.o\
 						ssp_sensorhub.o ssp_comm.o factory/mcu_chub.o \
 						ssp_platform.o
 
-obj-m += sensors_core.o
+obj-$(CONFIG_SENSORS_SSP) += sensors_core.o
 nanohub-$(CONFIG_SHUB) += chub_shub.o
