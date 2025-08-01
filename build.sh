@@ -76,6 +76,9 @@ g0s)
 b0s)
     BOARD=SRPUH13B009
 ;;
+r11s)
+    BOARD=SRPWC28A009
+;;
 *)
     unset_flags
     exit
