@@ -52,16 +52,28 @@ pushd $(dirname "$0") > /dev/null
 CORES=`cat /proc/cpuinfo | grep -c processor`
 
 # Define toolchain variables
-CLANG_DIR=$PWD/toolchain/clang-r416183b
-GCC_DIR=$PWD/toolchain/gcc_4.9
-PATH=$CLANG_DIR/bin:$CLANG_DIR/lib:$GCC_DIR/bin:$GCC_DIR/lib:$PATH
+CLANG_DIR=$PWD/toolchain/clang-r547379
+PATH=$CLANG_DIR/bin:$PATH
+
+# Check if toolchain exists
+if [ ! -f "$CLANG_DIR/bin/clang-20" ]; then
+    echo "-----------------------------------------------"
+    echo "Toolchain not found! Downloading..."
+    echo "-----------------------------------------------"
+    rm -rf $CLANG_DIR
+    mkdir -p $CLANG_DIR
+    pushd $CLANG_DIR > /dev/null
+    curl -LJOk https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz
+    tar xf main-clang-r547379.tar.gz
+    rm main-clang-r547379.tar.gz
+    echo "Cleaning up..."
+    popd > /dev/null
+fi
 
 MAKE_ARGS="
 LLVM=1 \
 LLVM_IAS=1 \
 ARCH=arm64 \
-READELF=$CLANG_DIR/bin/llvm-readelf \
-CROSS_COMPILE=$GCC_DIR/bin/aarch64-linux-gnu- \
 O=out
 "
 

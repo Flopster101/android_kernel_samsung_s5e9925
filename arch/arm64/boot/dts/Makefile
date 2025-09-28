@@ -34,7 +34,7 @@ dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r05.dtbo
 
 targets += dtbs
 DTB_LIST  := $(dtb-y) $(dtbo-y)
-always    := $(DTB_LIST)
+always-y  := $(DTB_LIST)
 
 dtbs: $(addprefix $(obj)/, $(DTB_LIST))
 

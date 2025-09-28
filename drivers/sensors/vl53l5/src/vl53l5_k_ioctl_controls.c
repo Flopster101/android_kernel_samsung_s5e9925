@@ -2835,9 +2835,8 @@ int vl53l5_k_power_onoff(struct vl53l5_k_module_t *data, int io, bool on)
 		}
 
 		if (data->iovdd_vreg) {
-			voltage = regulator_get_voltage(data->iovdd_vreg);
 			reg_enabled = regulator_is_enabled(data->iovdd_vreg);
-			vl53l5_k_log_info("iovdd reg_enabled=%d voltage=%d\n", reg_enabled, voltage);
+			vl53l5_k_log_info("iovdd reg_enabled=%d voltage=%d\n", reg_enabled, regulator_get_voltage(data->iovdd_vreg));
 
 			if (on) {
 				if (reg_enabled == 0) {
