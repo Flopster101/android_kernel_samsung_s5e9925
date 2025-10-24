@@ -19,12 +19,12 @@ dtbo-$(CONFIG_MODEL_G0S) += samsung/g0s/g0s_eur_openx_w01_r25.dtbo
 dtbo-$(CONFIG_MODEL_G0S) += samsung/g0s/g0s_eur_openx_w01_r26.dtbo
 dtbo-$(CONFIG_MODEL_G0S) += samsung/g0s/g0s_eur_openx_w01_r27.dtbo
 
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r19.dtbo
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r21.dtbo
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r24.dtbo
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r26.dtbo
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r27.dtbo
-dtbo-$(CONFIG_MODEL_B0S) += samsung/b0s/b0s_eur_openx_w01_r28.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r19.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r21.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r24.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r26.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r27.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r28.dtbo
 
 dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r00.dtbo
 dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r01.dtbo
