@@ -814,6 +814,23 @@ static const struct drm_bridge_funcs exynos_panel_bridge_funcs = {
 	.mode_set = exynos_panel_bridge_mode_set,
 };
 
+static struct device_node *mcd_drm_panel_find_ddi_node(struct exynos_panel *ctx)
+{
+	struct device_node *np;
+
+	if (!ctx || !ctx->mcd_panel_dev)
+		return NULL;
+
+	/* As fallback, use the ddi_node from panel_device */
+	np = ctx->mcd_panel_dev->ddi_node;
+	if (np) {
+		panel_info(ctx, "using ddi node: %s\n", np->name);
+		return of_node_get(np);
+	}
+
+	return NULL;
+}
+
 static void exynos_panel_parse_vendor_pps(struct exynos_panel *ctx)
 {
 		struct device_node *np;
@@ -852,8 +869,13 @@ static void exynos_panel_parse_vendor_pps(struct exynos_panel *ctx)
 
 		np = ctx->mcd_panel_dev->ap_vendor_setting_node;
 		if (!np) {
-			panel_err(ctx, "mcd_panel ddi-node is null\n");
-			return;
+			/* Try to find ddi node */
+			np = mcd_drm_panel_find_ddi_node(ctx);
+			if (!np) {
+				panel_info(ctx, "no ddi node or ap-vendor-setting, skipping vendor PPS (using defaults)\n");
+				return;
+			}
+			panel_info(ctx, "found ddi node, reading vendor PPS from it\n");
 		}
 
 		/* get vendor pps parameter from panel dt node */
@@ -880,8 +902,13 @@ static void exynos_panel_parse_vfp_detail(struct exynos_panel *ctx)
 
 	np = ctx->mcd_panel_dev->ap_vendor_setting_node;
 	if (!np) {
-		panel_err(ctx, "mcd_panel ddi-node is null\n");
-		return;
+		/* Try to find ddi node */
+		np = mcd_drm_panel_find_ddi_node(ctx);
+		if (!np) {
+			panel_info(ctx, "no ddi node or ap-vendor-setting, skipping VFP detail (using defaults)\n");
+			return;
+		}
+		panel_info(ctx, "found ddi node, reading VFP detail from it\n");
 	}
 
 	dsi = to_mipi_dsi_device(ctx->dev);
@@ -2516,8 +2543,16 @@ int mcd_drm_panel_get_size_mm(struct exynos_panel *ctx,
 	/* temporary get width_mm, height_mm directly */
 	np = ctx->mcd_panel_dev->ap_vendor_setting_node;
 	if (!np) {
-		panel_err(ctx, "mcd_panel ddi-node is null\n");
-		return -EINVAL;
+		/* Try to find ddi node as fallback */
+		np = mcd_drm_panel_find_ddi_node(ctx);
+		if (!np) {
+			panel_info(ctx, "no ddi node or ap-vendor-setting, using default size\n");
+			// Fallback values
+			*width_mm = 68;  /* 0x44 = 68 (6.8mm) */
+			*height_mm = 153; /* 0x99 = 153 (15.3mm) */
+			return 0;
+		}
+		panel_info(ctx, "found ddi node, reading size from it\n");
 	}
 
 #if IS_ENABLED(CONFIG_USDM_PANEL)
@@ -2543,8 +2578,19 @@ bool mcd_drm_panel_get_lp11_reset(struct exynos_panel *ctx)
 
 	np = ctx->mcd_panel_dev->ap_vendor_setting_node;
 	if (!np) {
-		panel_err(ctx, "mcd_panel ddi-node is null\n");
-		return -EINVAL;
+		/* Try to find ddi node */
+		np = mcd_drm_panel_find_ddi_node(ctx);
+		if (!np) {
+			/* Last resort: default based on panel type */
+			// bool default_lp11 = sec_get_feat(SEC_FEAT_LCD_DEVICE);
+			/* No LCD devices are supported on this kernel */
+			bool default_lp11 = false;
+			panel_info(ctx, "no ddi node or ap-vendor-setting, using default lp11_reset=%s for %s panel\n",
+				default_lp11 ? "true" : "false",
+				default_lp11 ? "LCD" : "OLED");
+			return default_lp11;
+		}
+		panel_info(ctx, "found ddi node, reading lp11_reset from it\n");
 	}
 
 	of_property_read_u32(np, "lp11_reset", &reg);
