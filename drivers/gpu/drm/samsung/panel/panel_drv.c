@@ -4452,8 +4452,8 @@ int panel_probe(struct panel_device *panel)
 #ifdef CONFIG_USDM_MDNIE
 	ret = mdnie_probe(&panel->mdnie, info->mdnie_tune);
 	if (unlikely(ret)) {
-		panel_err("failed to probe mdnie driver\n");
-		return -ENODEV;
+		panel_warn("failed to probe mdnie driver (may not be supported on this panel)\n");
+		/* mdnie is optional, continue without it */
 	}
 #endif
 
