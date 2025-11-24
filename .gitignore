@@ -159,3 +159,5 @@ sphinx_*/
 
 # Exception for fw files
 !build/ramdisk/**
+build/out
+toolchain
