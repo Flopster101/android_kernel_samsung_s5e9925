@@ -189,8 +189,17 @@ build_dtb() {
     echo "Building DTB image..."
     ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/s5e9925.cfg -d out/arch/arm64/boot/dts/exynos || abort 
 
-    # Don't build for unified
-    if [ "$MODEL" != "unified" ]; then
+    if [ "$MODEL" == "unified" ]; then
+        echo "-----------------------------------------------"
+        echo "Building DTBO images for all devices..."
+        # Build separate DTBO images for each device
+        for device in r0s g0s b0s; do
+            if [ -f "build/dtconfigs/$device.cfg" ]; then
+                echo "Building DTBO for $device..."
+                ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo_$device.img build/dtconfigs/$device.cfg -d out/arch/arm64/boot/dts/samsung/$device || abort
+            fi
+        done
+    elif [ "$MODEL" != "unified" ]; then
         echo "-----------------------------------------------"
         echo "Building DTBO image..."
         ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung/$MODEL || abort
@@ -347,12 +356,25 @@ build_zip() {
     echo "Building zip..."
     cp build/out/$MODEL/boot.img build/out/$MODEL/zip/files/boot.img
     cp build/out/$MODEL/vendor_boot.img build/out/$MODEL/zip/files/vendor_boot.img
-    # Copy DTBO only if it exists
-    if [ -f "build/out/$MODEL/dtbo.img" ]; then
-        cp build/out/$MODEL/dtbo.img build/out/$MODEL/zip/files/dtbo.img
+
+    if [ "$MODEL" == "unified" ]; then
+        # Copy all device-specific DTBO images
+        for device in r0s g0s b0s r11s; do
+            if [ -f "build/out/$MODEL/dtbo_$device.img" ]; then
+                cp build/out/$MODEL/dtbo_$device.img build/out/$MODEL/zip/files/dtbo_$device.img
+            fi
+        done
+        # Use unified updater-script and update-binary
+        cp build/updater-script-unified build/out/$MODEL/zip/META-INF/com/google/android/updater-script
+        cp build/update-binary-unified build/out/$MODEL/zip/META-INF/com/google/android/update-binary
+    else
+        # Copy single DTBO if it exists
+        if [ -f "build/out/$MODEL/dtbo.img" ]; then
+            cp build/out/$MODEL/dtbo.img build/out/$MODEL/zip/files/dtbo.img
+        fi
+        cp build/updater-script build/out/$MODEL/zip/META-INF/com/google/android/updater-script
+        cp build/update-binary build/out/$MODEL/zip/META-INF/com/google/android/update-binary
     fi
-    cp build/update-binary build/out/$MODEL/zip/META-INF/com/google/android/update-binary
-    cp build/updater-script build/out/$MODEL/zip/META-INF/com/google/android/updater-script
 
     version=$(grep -o 'CONFIG_LOCALVERSION="[^"]*"' arch/arm64/configs/s5e9925_defconfig | cut -d '"' -f 2)
     version=${version:1}
