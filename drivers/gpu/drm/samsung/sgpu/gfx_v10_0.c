@@ -27,6 +27,7 @@
 #include <linux/module.h>
 #include <linux/of_reserved_mem.h>
 #include <linux/pci.h>
+#include <linux/sec_detect.h>
 #ifdef CONFIG_DRM_SGPU_EXYNOS
 #include <soc/samsung/exynos-smc.h>
 #if IS_ENABLED(CONFIG_EXYNOS_IMGLOADER)
@@ -235,9 +236,37 @@ MODULE_FIRMWARE("sgpu/vangogh_lite_unified_m0_evt1.bin");
 MODULE_FIRMWARE("sgpu/vangogh_lite_unified_m1_evt0.bin");
 MODULE_FIRMWARE("sgpu/vangogh_lite_unified_m1_evt1.bin");
 MODULE_FIRMWARE("sgpu/vangogh_lite_unified.bin");
+MODULE_FIRMWARE("sgpu/vangogh_lite_unified_r0s.bin");
+MODULE_FIRMWARE("sgpu/vangogh_lite_unified_g0s.bin");
+MODULE_FIRMWARE("sgpu/vangogh_lite_unified_b0s.bin");
+MODULE_FIRMWARE("sgpu/vangogh_lite_unified_r11s.bin");
 #else
 DECLARE_BUILTIN_FIRMWARE("sgpu/vangogh_lite_unified.bin", unified_firmware);
 #endif /* CONFIG_DRM_SGPU_BUILTIN_FIRMWARE */
+
+/**
+ * gfx_v10_0_get_sgpu_firmware_name - Get device-specific SGPU firmware name
+ *
+ * Returns the device-specific firmware name based on sec_detect.
+ */
+static const char *gfx_v10_0_get_sgpu_firmware_name(void)
+{
+	enum SEC_devices device = sec_get_current_device();
+
+	switch (device) {
+	case SEC_R0S:
+		return "sgpu/vangogh_lite_unified_r0s.bin";
+	case SEC_G0S:
+		return "sgpu/vangogh_lite_unified_g0s.bin";
+	case SEC_B0S:
+		return "sgpu/vangogh_lite_unified_b0s.bin";
+	case SEC_R11S:
+		return "sgpu/vangogh_lite_unified_r11s.bin";
+	default:
+		/* Fallback to r0s firmware */
+		return "sgpu/vangogh_lite_unified_r0s.bin";
+	}
+}
 
 static struct gc_down_config gc_cfg_tb[] = {
 	{
@@ -5925,7 +5954,7 @@ static int g3d_imgloader_mem_setup(struct imgloader_desc *desc, const u8 *fw_dat
 	int r = 0;
 
 	r = request_firmware_into_buf(&adev->gfx.unified_fw,
-				      "sgpu/vangogh_lite_unified.bin",
+				      gfx_v10_0_get_sgpu_firmware_name(),
 				      adev->dev,
 				      adev->gfx.rlc.rlc_autoload_ptr,
 				      adev->gfx.rlc.autoload_size);
@@ -5985,7 +6014,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_buffer_init(struct amdgpu_device *ade
 	desc.dev = &adev->pldev->dev;
 	desc.owner = THIS_MODULE;
 	desc.ops = &g3d_imgloader_ops;
-	desc.fw_name = "sgpu/vangogh_lite_unified.bin";
+	desc.fw_name = gfx_v10_0_get_sgpu_firmware_name();
 	desc.name = "G3D_TMR";
 	desc.s2mpu_support = false;
 	desc.fw_id = 0;
@@ -5999,7 +6028,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_buffer_init(struct amdgpu_device *ade
 #endif /* CONFIG_DRM_SGPU_EXYNOS */
 #else /* CONFIG_DRM_SGPU_EXYNOS && CONFIG_EXYNOS_IMGLOADER */
 	r = request_firmware_into_buf(&adev->gfx.unified_fw,
-				      "sgpu/vangogh_lite_unified.bin",
+				      gfx_v10_0_get_sgpu_firmware_name(),
 				      adev->dev,
 				      adev->gfx.rlc.rlc_autoload_ptr,
 				      rmem->size);
