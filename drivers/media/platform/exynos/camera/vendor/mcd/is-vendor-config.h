@@ -13,7 +13,9 @@
 #ifndef IS_VENDOR_CONFIG_H
 #define IS_VENDOR_CONFIG_H
 
+#ifdef CONFIG_SEC_DETECT
 #include <linux/sec_detect.h>
+#endif
 
 #define USE_BINARY_PADDING_DATA_ADDED	/* for DDK signature */
 
@@ -23,6 +25,10 @@
 #define TZ_CONTROLLED_MEM_ATTRIBUTE 0
 #endif
 
+/* Unified RSV config for all devices */
+#ifdef CONFIG_SEC_DETECT
+#include "rsv/is-vendor-config_rsv_unified.h"
+#else
 #if defined(CONFIG_CAMERA_RSV_V01)
 #include "rsv/is-vendor-config_rsv_v01.h"
 #elif defined(CONFIG_CAMERA_RSV_V02)
@@ -34,8 +40,10 @@
 #else
 #include "rsv/is-vendor-config_rsv_v02.h" /* Default */
 #endif
+#endif
 
 /* Runtime configuration overrides based on sec_detect */
+#ifdef CONFIG_SEC_DETECT
 
 /* Helper function to get OIS stabilization delay */
 static inline u32 is_vendor_get_ois_stabilization_delay(void)
@@ -135,5 +143,7 @@ static inline u32 is_vendor_get_target_sensor_name(void)
 	}
 }
 #endif
+
+#endif /* CONFIG_SEC_DETECT */
 
 #endif
