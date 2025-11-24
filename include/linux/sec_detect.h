@@ -46,6 +46,9 @@ bool sec_get_feat(enum sec_feat feat);
 // Camera feature flags
 enum mcd_feat {
 	MCD_CAMERA_REAR_DUAL_CAL,	// Example camera feature flag
+	MCD_TYPE_RSV_V01,		// Camera RSV V01 type (r0s)
+	MCD_TYPE_RSV_V02,		// Camera RSV V02 type (g0s)
+	MCD_TYPE_RSV_V03,		// Camera RSV V03 type (b0s)
 	MCD_FEAT_COUNT
 };
 

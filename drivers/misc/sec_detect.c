@@ -89,13 +89,13 @@ static struct kobject *device_kobj;
 static inline void setup_camera_params(void) {
 	switch (g_sec_current_device) {
 	case SEC_R0S:
-		// S22 camera features - TODO
+		mcd_feat_flags[MCD_TYPE_RSV_V01] = true;
 		break;
 	case SEC_G0S:
-		// S22+ camera features - TODO
+		mcd_feat_flags[MCD_TYPE_RSV_V02] = true;
 		break;
 	case SEC_B0S:
-		// S22 Ultra camera features - TODO
+		mcd_feat_flags[MCD_TYPE_RSV_V03] = true;
 		break;
 	case SEC_R11S:
 		// S23 FE camera features - TODO

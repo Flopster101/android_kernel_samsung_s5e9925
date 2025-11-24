@@ -1547,7 +1547,7 @@ int is_vender_hw_init(struct is_vender *vender)
 	}
 
 #ifdef USE_SHARE_I2C_CLIENT
-	ret = is_vender_share_i2c_client(core, SOURSE_SENSOR_NAME, TARGET_SENSOR_NAME);
+	ret = is_vender_share_i2c_client(core, is_vendor_get_source_sensor_name(), is_vendor_get_target_sensor_name());
 	if (ret) {
 		err("i2c client copy failed!\n");
 		return -EINVAL;
