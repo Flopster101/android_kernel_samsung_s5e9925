@@ -12,6 +12,17 @@ subdir-ccflags-$(CONFIG_SEC_KUNIT) += \
 	-Wno-implicit-fallthrough \
 	-Wno-format
 
+# For unified builds, build all panel variants
+ifeq ($(CONFIG_SEC_DETECT), y)
+mcd-panel-s6e3fac_rainbow_r0-y += s6e3fac.o s6e3fac_rainbow_r0.o
+mcd-panel-s6e3fac_rainbow_r0-$(CONFIG_EXTEND_LIVE_CLOCK) += s6e3fac_aod.o
+obj-$(CONFIG_EXYNOS_DECON_LCD_S6E3FAC) += mcd-panel-s6e3fac_rainbow_r0.o
+
+mcd-panel-s6e3fac_rainbow_g0-y += s6e3fac.o s6e3fac_rainbow_g0.o
+mcd-panel-s6e3fac_rainbow_g0-$(CONFIG_EXTEND_LIVE_CLOCK) += s6e3fac_aod.o
+obj-$(CONFIG_EXYNOS_DECON_LCD_S6E3FAC) += mcd-panel-s6e3fac_rainbow_g0.o
+else
+# Device-specific builds
 ifeq ($(CONFIG_MODEL_R0S), y)
 mcd-panel-s6e3fac_rainbow_r0-y += s6e3fac.o s6e3fac_rainbow_r0.o
 mcd-panel-s6e3fac_rainbow_r0-$(CONFIG_EXTEND_LIVE_CLOCK) += s6e3fac_aod.o
@@ -20,4 +31,5 @@ else ifeq ($(CONFIG_MODEL_G0S), y)
 mcd-panel-s6e3fac_rainbow_g0-y += s6e3fac.o s6e3fac_rainbow_g0.o
 mcd-panel-s6e3fac_rainbow_g0-$(CONFIG_EXTEND_LIVE_CLOCK) += s6e3fac_aod.o
 obj-$(CONFIG_EXYNOS_DECON_LCD_S6E3FAC) += mcd-panel-s6e3fac_rainbow_g0.o
+endif
 endif
