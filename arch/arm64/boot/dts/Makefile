@@ -1,6 +1,41 @@
 # SPDX-License-Identifier: GPL-2.0
 dtb-$(CONFIG_ARCH_EXYNOS) += exynos/s5e9925.dtb
 
+# For unified builds, include all DTBO files
+# Even though these will likely not be used.
+ifeq ($(CONFIG_SEC_DETECT), y)
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r19.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r20.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r21.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r23.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r24.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r25.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r26.dtbo
+dtbo-y += samsung/r0s/r0s_eur_openx_w01_r27.dtbo
+
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r19.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r20.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r21.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r23.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r24.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r25.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r26.dtbo
+dtbo-y += samsung/g0s/g0s_eur_openx_w01_r27.dtbo
+
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r19.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r21.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r24.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r26.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r27.dtbo
+dtbo-y += samsung/b0s/b0s_eur_openx_w01_r28.dtbo
+
+dtbo-y += samsung/r11s/r11s_eur_openx_w01_r00.dtbo
+dtbo-y += samsung/r11s/r11s_eur_openx_w01_r01.dtbo
+dtbo-y += samsung/r11s/r11s_eur_openx_w01_r02.dtbo
+dtbo-y += samsung/r11s/r11s_eur_openx_w01_r03.dtbo
+dtbo-y += samsung/r11s/r11s_eur_openx_w01_r05.dtbo
+else
+# Device-specific builds
 dtbo-$(CONFIG_MODEL_R0S) += samsung/r0s/r0s_eur_openx_w01_r19.dtbo
 dtbo-$(CONFIG_MODEL_R0S) += samsung/r0s/r0s_eur_openx_w01_r20.dtbo
 dtbo-$(CONFIG_MODEL_R0S) += samsung/r0s/r0s_eur_openx_w01_r21.dtbo
@@ -31,6 +66,7 @@ dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r01.dtbo
 dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r02.dtbo
 dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r03.dtbo
 dtbo-$(CONFIG_MODEL_R11S) += samsung/r11s/r11s_eur_openx_w01_r05.dtbo
+endif
 
 targets += dtbs
 DTB_LIST  := $(dtb-y) $(dtbo-y)
