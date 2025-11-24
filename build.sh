@@ -88,6 +88,9 @@ g0s)
 b0s)
     BOARD=SRPUH13B009
 ;;
+unified)
+    BOARD=SRPUH13A011 # Irrelevant here
+;;
 *)
     unset_flags
     exit
@@ -156,8 +159,10 @@ build_boot() {
     # Copy common files for boot.img's RAMDisk
     cp -a build/ramdisk/boot/boot_ramdisk00 build/out/$MODEL
     
-    # Copy device build.prop file for boot.img's RAMDisk
-    cp -a build/ramdisk/boot/device/$MODEL/* build/out/$MODEL/boot_ramdisk00/system/etc/ramdisk
+    # Copy device build.prop file for boot.img's RAMDisk (skip for unified)
+    if [ "$MODEL" != "unified" ] && [ -d "build/ramdisk/boot/device/$MODEL" ]; then
+        cp -a build/ramdisk/boot/device/$MODEL/* build/out/$MODEL/boot_ramdisk00/system/etc/ramdisk
+    fi
 
     pushd build/out/$MODEL/boot_ramdisk00 > /dev/null
     find . ! -name . | LC_ALL=C sort | cpio -o -H newc -R root:root | lz4 -l > ../boot_ramdisk || abort
@@ -184,9 +189,12 @@ build_dtb() {
     echo "Building DTB image..."
     ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtb.img build/dtconfigs/s5e9925.cfg -d out/arch/arm64/boot/dts/exynos || abort 
 
-    echo "-----------------------------------------------"
-    echo "Building DTBO image..."
-    ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung/$MODEL || abort
+    # Don't build for unified
+    if [ "$MODEL" != "unified" ]; then
+        echo "-----------------------------------------------"
+        echo "Building DTBO image..."
+        ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/$MODEL.cfg -d out/arch/arm64/boot/dts/samsung/$MODEL || abort
+    fi
     
 }
 
@@ -296,7 +304,9 @@ build_vendor_boot() {
     cp -a build/ramdisk/vendor_boot/ramdisk00 build/out/$MODEL/vendor_ramdisk00
     
     # Copy device firmware files for vendor_ramdisk00
-    cp -a build/ramdisk/vendor_boot/vendor_firmware/$MODEL/* build/out/$MODEL/vendor_ramdisk00
+    if [ -d "build/ramdisk/vendor_boot/vendor_firmware/$MODEL" ]; then
+        cp -a build/ramdisk/vendor_boot/vendor_firmware/$MODEL/* build/out/$MODEL/vendor_ramdisk00
+    fi
 
     # Pack RAMDisks
     # vendor_ramdisk == ramdisk00
@@ -337,7 +347,10 @@ build_zip() {
     echo "Building zip..."
     cp build/out/$MODEL/boot.img build/out/$MODEL/zip/files/boot.img
     cp build/out/$MODEL/vendor_boot.img build/out/$MODEL/zip/files/vendor_boot.img
-    cp build/out/$MODEL/dtbo.img build/out/$MODEL/zip/files/dtbo.img
+    # Copy DTBO only if it exists
+    if [ -f "build/out/$MODEL/dtbo.img" ]; then
+        cp build/out/$MODEL/dtbo.img build/out/$MODEL/zip/files/dtbo.img
+    fi
     cp build/update-binary build/out/$MODEL/zip/META-INF/com/google/android/update-binary
     cp build/updater-script build/out/$MODEL/zip/META-INF/com/google/android/updater-script
 
