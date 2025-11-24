@@ -35,7 +35,57 @@
 #include "rsv/is-vendor-config_rsv_v02.h" /* Default */
 #endif
 
-/* Runtime sensor name overrides */
+/* Runtime configuration overrides based on sec_detect */
+
+/* Helper function to get OIS stabilization delay */
+static inline u32 is_vendor_get_ois_stabilization_delay(void)
+{
+	enum SEC_devices device = sec_get_current_device();
+
+	switch (device) {
+	case SEC_R0S:
+		/* RSV_V01: S22 */
+		return 7000; /* 7ms */
+	case SEC_G0S:
+		/* RSV_V02: S22+ */
+		return 7000; /* 7ms */
+	case SEC_B0S:
+		/* RSV_V03: S22 Ultra */
+		return 15000; /* 15ms */
+	case SEC_R11S:
+		/* S23 FE - PLACEHOLDER */
+		return 7000; /* Default to 7ms */
+	default:
+		/* Fallback */
+		return 7000;
+	}
+}
+
+/* Helper function to get tele OIS tilt ROM ID */
+/* Returns int to avoid needing full enum definition */
+static inline int is_vendor_get_tele_ois_tilt_rom_id(void)
+{
+	enum SEC_devices device = sec_get_current_device();
+
+	switch (device) {
+	case SEC_R0S:
+		/* RSV_V01: S22 */
+		return 4; /* ROM_ID_REAR3 = TELE_OIS_ROM_ID */
+	case SEC_G0S:
+		/* RSV_V02: S22+ */
+		return 4; /* ROM_ID_REAR3 = TELE_OIS_ROM_ID */
+	case SEC_B0S:
+		/* RSV_V03: S22 Ultra */
+		return 6; /* ROM_ID_REAR4 = TELE2_OIS_ROM_ID */
+	case SEC_R11S:
+		/* S23 FE - PLACEHOLDER */
+		return 4; /* ROM_ID_REAR3 - Default to REAR3 */
+	default:
+		/* Fallback */
+		return 4; /* ROM_ID_REAR3 */
+	}
+}
+
 #ifdef USE_SHARE_I2C_CLIENT
 
 /* Helper functions to get sensor names at runtime based on sec_detect */

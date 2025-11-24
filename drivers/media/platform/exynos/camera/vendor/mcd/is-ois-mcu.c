@@ -1245,7 +1245,8 @@ int ois_mcu_set_mode(struct v4l2_subdev *subdev, int mode)
 
 #ifdef USE_OIS_STABILIZATION_DELAY
 	if (!mcu->is_mcu_active) {
-		usleep_range(USE_OIS_STABILIZATION_DELAY, USE_OIS_STABILIZATION_DELAY + 10);
+		u32 delay = is_vendor_get_ois_stabilization_delay();
+		usleep_range(delay, delay + 10);
 		mcu->is_mcu_active = true;
 		info_mcu("%s : Stabilization delay applied\n", __func__);
 	}

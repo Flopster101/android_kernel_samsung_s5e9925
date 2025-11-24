@@ -1061,7 +1061,7 @@ int is_sec_parse_rom_info(struct is_rom_info *finfo, char *buf, int rom_id)
 		}
 #endif
 
-		if (rom_id == TELE_OIS_TILT_ROM_ID) {
+		if (rom_id == is_vendor_get_tele_ois_tilt_rom_id()) {
 			memcpy(ois_pinfo->tele_tilt_romdata.xgg, &buf[finfo->rom_ois_list[7]], IS_OIS_GYRO_DATA_SIZE);
 			memcpy(ois_pinfo->tele_tilt_romdata.ygg, &buf[finfo->rom_ois_list[8]], IS_OIS_GYRO_DATA_SIZE);
 			memcpy(ois_pinfo->tele_tilt_romdata.xcoef, &buf[finfo->rom_ois_list[9]], IS_OIS_COEF_DATA_SIZE);
@@ -1105,7 +1105,7 @@ int is_sec_parse_rom_info(struct is_rom_info *finfo, char *buf, int rom_id)
 		}
 #endif
 
-		if (rom_id == TELE_OIS_TILT_ROM_ID) {
+		if (rom_id == is_vendor_get_tele_ois_tilt_rom_id()) {
 			memcpy(ois_pinfo->tele_tilt_romdata.xgg, &buf[finfo->rom_ois_list[0]], IS_OIS_GYRO_DATA_SIZE);
 			memcpy(ois_pinfo->tele_tilt_romdata.ygg, &buf[finfo->rom_ois_list[1]], IS_OIS_GYRO_DATA_SIZE);
 			memcpy(ois_pinfo->tele_tilt_romdata.xcoef, &buf[finfo->rom_ois_list[2]], IS_OIS_COEF_DATA_SIZE);
