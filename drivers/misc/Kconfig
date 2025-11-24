@@ -481,6 +481,20 @@ config HISI_HIKEY_USB
 	  switching between the dual-role USB-C port and the USB-A host ports
 	  using only one USB controller.
 
+config SEC_DETECT
+	tristate "Detect currently running Samsung device"
+	default m
+	help
+		Helps detect what device is currently running the kernel.
+		The following are currently supported: Galaxy S22 (r0s), S22+ (g0s), S22 Ultra (b0s), S23 FE (r11s).
+
+config SEC_DETECT_SYSFS
+	bool "Report running device through sysfs"
+	depends on SEC_DETECT && SYSFS
+	default y
+	help
+		Will show the currently running device through the sysfs node: /sys/kernel/sec_detect/device_name.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
