@@ -140,19 +140,19 @@ static int __init sec_detect_init(void) {
 		goto exit_put_root;
 	}
 
-	if (strstr(machine_name, "r0s") != NULL) {
+	if (strstr(machine_name, "R0S") != NULL) {
 		g_sec_current_device = SEC_R0S;
 		strscpy(g_sec_current_device_name, "r0s", sizeof(g_sec_current_device_name));
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
-	} else if (strstr(machine_name, "g0s") != NULL) {
+	} else if (strstr(machine_name, "G0S") != NULL) {
 		g_sec_current_device = SEC_G0S;
 		strscpy(g_sec_current_device_name, "g0s", sizeof(g_sec_current_device_name));
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
-	} else if (strstr(machine_name, "b0s") != NULL) {
+	} else if (strstr(machine_name, "B0S") != NULL) {
 		g_sec_current_device = SEC_B0S;
 		strscpy(g_sec_current_device_name, "b0s", sizeof(g_sec_current_device_name));
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
-	} else if (strstr(machine_name, "r11s") != NULL) {
+	} else if (strstr(machine_name, "R11S") != NULL) {
 		g_sec_current_device = SEC_R11S;
 		strscpy(g_sec_current_device_name, "r11s", sizeof(g_sec_current_device_name));
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
