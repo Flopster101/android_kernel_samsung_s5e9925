@@ -88,6 +88,7 @@
 #if defined (SEC_READ_MACADDR_SYSFS) || defined (SEC_WRITE_VERSION_IN_SYSFS) || defined (SEC_WRITE_SOFTAP_INFO_IN_SYSFS) || defined (SEC_CONFIG_PSM_SYSFS)
 #include <net/cnss2.h>
 #endif
+#include <linux/of.h>
 
 #ifdef WLAN_FEATURE_DP_BUS_BANDWIDTH
 #include "qdf_periodic_work.h"
@@ -17952,11 +17953,32 @@ static int hdd_register_driver_retry(void)
 	return errno;
 }
 
+static bool hdd_is_valid_cnss_dt_node_found(void)
+{
+	struct device_node *dn = NULL;
+
+	for_each_node_with_property(dn, "qcom,wlan") {
+		if (of_device_is_available(dn))
+			break;
+	}
+
+	if (dn)
+		return true;
+
+	return false;
+}
+
 int hdd_driver_load(void)
 {
 	struct osif_driver_sync *driver_sync;
 	QDF_STATUS status;
 	int errno;
+
+	if (!hdd_is_valid_cnss_dt_node_found()) {
+		pr_info("%s: No valid CNSS device tree node found, skipping driver load\n",
+			WLAN_MODULE_NAME);
+		return 0;
+	}
 
 	pr_err("%s: Loading driver v%s\n", WLAN_MODULE_NAME,
 	       g_wlan_driver_version);
