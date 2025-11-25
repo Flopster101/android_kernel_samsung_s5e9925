@@ -300,8 +300,9 @@ dhd_wlan_init_gpio(void)
 
 	root_node = of_find_compatible_node(NULL, NULL, wlan_node);
 	if (!root_node) {
-		WARN(1, "failed to get device node of bcm4354\n");
-		return -ENODEV;
+		printk(KERN_INFO "%s: failed to get device node of bcm4354, skipping GPIO initialization\n",
+		       __FUNCTION__);
+		return 0;
 	}
 
 	if (!of_device_is_available(root_node)) {
