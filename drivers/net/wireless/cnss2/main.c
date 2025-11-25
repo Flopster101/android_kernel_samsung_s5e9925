@@ -4110,8 +4110,10 @@ static int __init cnss_initialize(void)
 {
 	int ret = 0;
 
-	if (!cnss_is_valid_dt_node_found())
-		return -ENODEV;
+	if (!cnss_is_valid_dt_node_found()) {
+		cnss_pr_info("No valid CNSS device tree node found, skipping initialization\n");
+		return 0;
+	}
 
 	cnss_debug_init();
 	ret = platform_driver_register(&cnss_platform_driver);

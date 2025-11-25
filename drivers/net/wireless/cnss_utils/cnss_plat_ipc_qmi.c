@@ -947,8 +947,10 @@ static DECLARE_WORK(cnss_plat_ipc_init_work, cnss_plat_ipc_init_fn);
 
 static int __init cnss_plat_ipc_qmi_svc_init(void)
 {
-	if (!cnss_plat_ipc_is_valid_dt_node_found())
-		return -ENODEV;
+	if (!cnss_plat_ipc_is_valid_dt_node_found()) {
+		cnss_plat_ipc_info("No valid CNSS device tree node found, skipping initialization\n");
+		return 0;
+	}
 
 	/* Schedule a work to do real init to avoid blocking here */
 	cnss_plat_ipc_logging_init();

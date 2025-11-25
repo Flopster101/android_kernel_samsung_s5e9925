@@ -211,8 +211,10 @@ static bool cld80211_is_valid_dt_node_found(void)
 
 static int __init cld80211_init(void)
 {
-	if (!cld80211_is_valid_dt_node_found())
-		return -ENODEV;
+	if (!cld80211_is_valid_dt_node_found()) {
+		pr_info("cld80211: No valid CNSS device tree node found, skipping initialization\n");
+		return 0;
+	}
 
 	return __cld80211_init();
 }
