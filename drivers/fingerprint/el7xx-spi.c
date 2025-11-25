@@ -25,7 +25,7 @@
 #include <linux/of_gpio.h>
 #include <linux/sysfs.h>
 
-struct debug_logger *g_logger;
+extern struct debug_logger *g_logger;
 
 static void el7xx_reset(struct el7xx_data *etspi)
 {

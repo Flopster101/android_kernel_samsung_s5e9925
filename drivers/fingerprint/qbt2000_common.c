@@ -14,6 +14,8 @@
 #include "fingerprint.h"
 #include "qbt2000_common.h"
 
+extern struct debug_logger *g_logger;
+
 /*
  * struct ipc_msg_type_to_fw_event -
  *      entry in mapping between an IPC message type to a firmware event
@@ -1312,6 +1314,9 @@ static struct platform_driver qbt2000_plat_driver = {
 	},
 };
 
+extern int qbtspi_init(void);
+extern void qbtspi_exit(void);
+
 static int __init qbt2000_init(void)
 {
 	int rc = 0;
@@ -1319,13 +1324,16 @@ static int __init qbt2000_init(void)
 	rc = platform_driver_register(&qbt2000_plat_driver);
 	pr_info("ret : %d\n", rc);
 
+	qbtspi_init();
+
 	return rc;
 }
 
 static void __exit qbt2000_exit(void)
 {
 	pr_info("entry\n");
-	return platform_driver_unregister(&qbt2000_plat_driver);
+	qbtspi_exit();
+	platform_driver_unregister(&qbt2000_plat_driver);
 }
 
 late_initcall(qbt2000_init);
