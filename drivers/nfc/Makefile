@@ -58,6 +58,10 @@ obj-$(CONFIG_SEC_STAR) += sec-star/sec_star.o \
 
 obj-$(CONFIG_STAR_K250A) += sec-star/sec_k250a.o
 endif # CONFIG_SEC_STAR
+
+# LSI NFC driver (for r11s)
+# The samsung driver is the older version for r0s/g0s/b0s
+obj-$(CONFIG_SEC_NFC_LSI)		+= lsi/
 endif # CONFIG_NFC_NXP_COMBINED
 
 ccflags-y 			+= -DRECOVERY_ENABLE -UDEBUG
