@@ -13206,6 +13206,7 @@ _dhd_module_init(void)
 		} else {
 			if (err == -ENXIO) {
 				DHD_ERROR(("%s: driver is disabled\n", __FUNCTION__));
+				err = 0; /* Return success when driver is disabled */
 				break;
 			}
 #if defined(CONFIG_ARCH_WAIPIO) || defined(CONFIG_SOC_S5E9925)

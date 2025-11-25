@@ -42,6 +42,7 @@
 #ifdef CONFIG_DTS
 #include<linux/regulator/consumer.h>
 #include<linux/of_gpio.h>
+#include<linux/of.h>
 #endif /* CONFIG_DTS */
 #define WIFI_PLAT_NAME		"bcmdhd_wlan"
 #define WIFI_PLAT_NAME2		"bcm4329_wlan"
@@ -653,6 +654,13 @@ int dhd_wifi_platform_register_drv(void)
 {
 	int err = 0;
 	struct device *dev;
+	struct device_node *root_node;
+
+	root_node = of_find_compatible_node(NULL, NULL, "samsung,brcm-wlan");
+	if (!root_node) {
+		DHD_ERROR(("No valid Broadcom device tree node found, skipping driver registration\n"));
+		return -ENXIO;
+	}
 
 	/* register Broadcom wifi platform data driver if multi-chip is enabled,
 	 * otherwise use Android style wifi platform data (aka wifi control function)

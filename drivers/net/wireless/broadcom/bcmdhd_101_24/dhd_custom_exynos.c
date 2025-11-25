@@ -302,7 +302,7 @@ dhd_wlan_init_gpio(void)
 	if (!root_node) {
 		printk(KERN_INFO "%s: failed to get device node of bcm4354, skipping GPIO initialization\n",
 		       __FUNCTION__);
-		return 0;
+		return -ENXIO;
 	}
 
 	if (!of_device_is_available(root_node)) {
@@ -428,9 +428,11 @@ int
 dhd_wlan_deinit(void)
 {
 #ifdef CONFIG_BCMDHD_OOB_HOST_WAKE
-	gpio_free(wlan_host_wake_up);
+	if (gpio_is_valid(wlan_host_wake_up))
+		gpio_free(wlan_host_wake_up);
 #endif /* CONFIG_BCMDHD_OOB_HOST_WAKE */
-	gpio_free(wlan_pwr_on);
+	if (gpio_is_valid(wlan_pwr_on))
+		gpio_free(wlan_pwr_on);
 
 #ifdef CONFIG_BROADCOM_WIFI_RESERVED_MEM
 	dhd_exit_wlan_mem();
