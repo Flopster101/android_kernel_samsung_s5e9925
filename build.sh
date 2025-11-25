@@ -224,11 +224,6 @@ build_modules() {
     # The filenames were fetched from vendor_module_list_s5e9925.cfg and vendor_module_list_s5e9925_b0s.cfg.
     FILENAMES="
     sec_debug_coredump.ko
-    fingerprint.ko
-    fingerprint_sysfs.ko
-    input_booster_lkm.ko
-    dhd.ko
-    wlan.ko
     "
     for FILENAME in $FILENAMES; do
         FILE=$(find out/$MODULES_FOLDER -type f -name "$FILENAME")
