@@ -639,6 +639,8 @@ int nfc_i2c_dev_probe(struct i2c_client *client,const struct i2c_device_id *id)
 	struct platform_gpio *nfc_gpio = NULL;
 
 #ifdef CONFIG_SEC_NFC_LOGGER
+	nfc_logger_init();
+	nfc_logger_set_max_count(-1);
 #ifdef CONFIG_SEC_NFC_LOGGER_ADD_ACPM_LOG
 	nfc_logger_acpm_log_init(0x0);
 #endif
@@ -1122,10 +1124,6 @@ static int __init nfc_i2c_dev_init(void)
 {
 	int ret = 0;
 
-#ifdef CONFIG_SEC_NFC_LOGGER
-	nfc_logger_init();
-	nfc_logger_set_max_count(-1);
-#endif
 	NFC_LOG_INFO("%s: Loading NXP NFC I2C driver\n", __func__);
 #if IS_ENABLED(CONFIG_SAMSUNG_NFC)
 	if (nfc_get_lpcharge() == LPM_TRUE)
@@ -1168,10 +1166,6 @@ static int __init nfc_i2c_dev_init(void)
 {
 	int ret = 0;
 
-#ifdef CONFIG_SEC_NFC_LOGGER
-	nfc_logger_init();
-	nfc_logger_set_max_count(-1);
-#endif
 	NFC_LOG_INFO("%s: Loading NXP NFC I2C driver\n", __func__);
 #if IS_ENABLED(CONFIG_SAMSUNG_NFC)
 	if (nfc_get_lpcharge() == LPM_TRUE)

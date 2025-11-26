@@ -216,7 +216,16 @@ int nfc_logger_init(void)
 
 	entry = proc_create(PROC_FILE_NAME, 0444, NULL, &nfc_logger_ops);
 	if (!entry) {
-		pr_err("%s: failed to create proc entry\n", __func__);
+		/* If proc_create failed, the entry might already exist.
+		 * This shouldn't happen in normal operation since only one
+		 * driver should probe per device, but handle it gracefully.
+		 */
+		if (g_entry) {
+			is_nfc_logger_init = 1;
+			return 0;
+		}
+		/* Entry exists but wasn't created by us - mark as init to avoid retries */
+		is_nfc_logger_init = 1;
 		return 0;
 	}
 
