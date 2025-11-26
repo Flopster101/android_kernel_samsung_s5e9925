@@ -4463,8 +4463,8 @@ int panel_probe(struct panel_device *panel)
 #ifdef CONFIG_USDM_PANEL_MAFPC
 	ret = panel_bind_mafpc(panel, info->mafpc_info);
 	if (unlikely(ret < 0)) {
-		panel_err("failed to probe mafpc driver\n");
-		return -ENODEV;
+		panel_err("failed to probe mafpc driver, mafpc support disabled\n");
+		ret = 0;
 	}
 #endif
 
