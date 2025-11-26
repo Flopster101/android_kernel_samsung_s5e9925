@@ -20,6 +20,11 @@ ifelse(getprop("ro.product.model") == "SM-S908B",
     package_extract_file("files/dtbo_b0s.img", "/dev/block/by-name/dtbo");
 ,"");
 
+ifelse(getprop("ro.product.model") == "SM-S711B",
+    ui_print("Flashing DTBO for S23 FE (r11s)...");
+    package_extract_file("files/dtbo_r11s.img", "/dev/block/by-name/dtbo");
+,"");
+
 ui_print("Installation done!");
 ui_print(" ");
 

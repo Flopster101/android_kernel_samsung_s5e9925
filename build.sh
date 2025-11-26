@@ -193,7 +193,7 @@ build_dtb() {
         echo "-----------------------------------------------"
         echo "Building DTBO images for all devices..."
         # Build separate DTBO images for each device
-        for device in r0s g0s b0s; do
+        for device in r0s g0s b0s r11s; do
             if [ -f "build/dtconfigs/$device.cfg" ]; then
                 echo "Building DTBO for $device..."
                 ./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo_$device.img build/dtconfigs/$device.cfg -d out/arch/arm64/boot/dts/samsung/$device || abort
