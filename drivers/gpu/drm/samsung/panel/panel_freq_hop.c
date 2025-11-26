@@ -246,6 +246,10 @@ int panel_freq_hop_probe(struct panel_device *panel,
 
 	INIT_LIST_HEAD(&freq_hop->head);
 	if (!elems) {
+		if (!panel->freq_hop_node) {
+			panel_info("freq-hop node not available, freq-hop support disabled\n");
+			return 0;
+		}
 		ret = freq_hop_parse_dt(panel->freq_hop_node, freq_hop);
 		if (ret < 0) {
 			pr_err("FREQ_HOP: ERR:%s: failed to parse freq_hop dt\n", __func__);

@@ -3708,9 +3708,10 @@ int panel_reprobe(struct panel_device *panel)
 #ifdef CONFIG_USDM_PANEL_COPR
 		ret = copr_prepare(panel, info->copr_data);
 		if (unlikely(ret < 0)) {
-			panel_err("failed to init copr driver\n");
-			BUG();
-			return -ENODEV;
+			panel_err("failed to init copr driver, copr support disabled\n");
+			// BUG();
+			// return -ENODEV;
+			ret = 0;
 		}
 #endif
 
@@ -4364,9 +4365,10 @@ int panel_probe(struct panel_device *panel)
 #ifdef CONFIG_USDM_PANEL_COPR
 	ret = copr_prepare(panel, info->copr_data);
 	if (unlikely(ret < 0)) {
-		panel_err("failed to init copr driver\n");
-		BUG();
-		return -ENODEV;
+		panel_err("failed to init copr driver, copr support disabled\n");
+		// BUG();
+		// return -ENODEV;
+		ret = 0;
 	}
 #endif
 
@@ -4412,9 +4414,10 @@ int panel_probe(struct panel_device *panel)
 #ifdef CONFIG_USDM_PANEL_COPR
 	ret = copr_probe(panel, info->copr_data);
 	if (unlikely(ret)) {
-		panel_err("failed to probe copr driver\n");
-		BUG();
-		return -ENODEV;
+		panel_err("failed to probe copr driver, copr support disabled\n");
+		// BUG();
+		// return -ENODEV;
+		ret = 0;
 	}
 #endif
 
@@ -4681,7 +4684,8 @@ int panel_remove(struct panel_device *panel)
 	ret = copr_remove(panel);
 	if (ret < 0) {
 		panel_err("failed to remove copr driver\n");
-		return ret;
+		// return ret;
+		ret = 0;
 	}
 #endif
 
@@ -6678,11 +6682,12 @@ static int panel_parse_panel_lookup(struct panel_device *panel)
 #if defined(CONFIG_USDM_PANEL_FREQ_HOP)
 		node = of_parse_phandle(panel_np, DT_NAME_FREQ_TABLE, 0);
 		if (!node) {
-			panel_err("failed to get phandle of %s\n", DT_NAME_FREQ_TABLE);
-			return -EINVAL;
+			panel_info("freq-hop property not found, freq-hop support disabled\n");
+			lut->freq_hop_node = NULL;
+		} else {
+			lut->freq_hop_node = node;
+			of_node_put(node);
 		}
-		lut->freq_hop_node = node;
-		of_node_put(node);
 #endif
 
 #if defined(CONFIG_USDM_SDP_ADAPTIVE_MIPI) ||\
