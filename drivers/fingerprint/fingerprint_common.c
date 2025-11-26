@@ -23,12 +23,16 @@ EXPORT_SYMBOL(set_sensor_type);
 
 void enable_fp_debug_timer(struct debug_logger *logger)
 {
+	if (!logger)
+		return;
 	mod_timer(&logger->dbg_timer, round_jiffies_up(jiffies + DEBUG_TIMER_SEC));
 }
 EXPORT_SYMBOL(enable_fp_debug_timer);
 
 void disable_fp_debug_timer(struct debug_logger *logger)
 {
+	if (!logger)
+		return;
 	del_timer_sync(&logger->dbg_timer);
 	cancel_work_sync(&logger->work_debug);
 }
@@ -40,6 +44,8 @@ void timer_func(unsigned long ptr)
 void timer_func(struct timer_list *t)
 #endif
 {
+	if (!g_logger)
+		return;
 	queue_work(g_logger->wq_dbg, &g_logger->work_debug);
 	enable_fp_debug_timer(g_logger);
 }
