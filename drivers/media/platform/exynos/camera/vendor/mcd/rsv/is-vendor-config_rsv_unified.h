@@ -15,7 +15,8 @@
 #define VENDER_PATH
 #define USE_CAMERA_SENSOR_RETENTION 1
 #if IS_ENABLED(USE_CAMERA_SENSOR_RETENTION)
-#define CAMERA_RETENTION_SHARE_POWER	"VDDIO_1.8V_CAM"
+/* is_vendor_get_camera_retention_share_power() */
+#define CAMERA_RETENTION_SHARE_POWER	""
 #endif
 #define CAMERA_REAR_DUAL_CAL
 #define CAMERA_REAR2
@@ -107,9 +108,11 @@
 #define TELE_OIS_ROM_ID ROM_ID_REAR3
 /* V03 only */
 #define TELE2_OIS_ROM_ID ROM_ID_REAR4
-/* TELE_OIS_TILT_ROM_ID is handled at runtime via is_vendor_get_tele_ois_tilt_rom_id() */
-#define USE_OIS_HALL_DATA_FOR_VDIS
-/* USE_OIS_STABILIZATION_DELAY is handled at runtime via is_vendor_get_ois_stabilization_delay() */
+/* is_vendor_get_tele_ois_tilt_rom_id() */
+#define TELE_OIS_TILT_ROM_ID TELE_OIS_ROM_ID
+/* USE_OIS_HALL_DATA_FOR_VDIS is handled at runtime via sec_detect MCD_OIS_HALL_DATA_FOR_VDIS */
+/* is_vendor_get_ois_stabilization_delay() */
+#define USE_OIS_STABILIZATION_DELAY 7000 //7ms
 /* V03 only */
 #define USE_OIS_SHIFT_FOR_12BIT
 /* Tele sensor crop shift and OIS calibration will be applied instead of this feature in this project */
@@ -163,6 +166,17 @@
 #define CAMERA_IMX754_10X_FLIP 3
 
 //#define USE_SENSOR_TEST_SETTING
+
+/* R11S */
+/* is_vendor_get_ak737x_soft_landing_delay() */
+#define AK737X_SOFT_LANDING_DELAY_ON_DIRECTORS_VIEW 0
+
+#define USE_CAMERA_CHECK_EEPROM_STATUS
+#if !IS_ENABLED(CONFIG_USE_SIGNED_BINARY)
+#define USE_MIPI_PHY_TUNING
+#endif
+#define USE_CAMERA_HEAP_FOR_ALL
+#define USE_OIS_HALL_DATA_FOR_VDIS
 
 #endif /* IS_VENDOR_CONFIG_RSV_UNIFIED_H */
 

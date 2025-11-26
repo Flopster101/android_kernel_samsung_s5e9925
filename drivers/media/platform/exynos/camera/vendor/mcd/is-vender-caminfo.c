@@ -20,11 +20,14 @@
 
 #include "is-config.h"
 #include "is-vender-caminfo.h"
-#include "is-vender-test-sensor.h"
 #include "is-vender-specific.h"
 #include "is-sec-define.h"
 #include "is-device-sensor-peri.h"
 #include "is-sysfs.h"
+#ifdef CONFIG_SEC_DETECT
+#include "is-vendor-config.h"
+#endif
+#include "is-vender-test-sensor.h"
 
 static int is_vender_caminfo_open(struct inode *inode, struct file *file)
 {
@@ -294,6 +297,11 @@ static int is_vender_caminfo_cmd_get_ois_hall_data(void __user *user_data)
 
 	core = is_get_is_core();
 
+#ifdef CONFIG_SEC_DETECT
+	if (!is_vendor_use_ois_hall_data_for_vdis()) {
+		return -ENOTSUPP;
+	}
+#endif
 	is_ois_get_hall_data(core, &halldata);
 
 	if (copy_to_user(user_data, (void *)&halldata, sizeof(struct is_ois_hall_data))) {
@@ -376,14 +384,22 @@ static long is_vender_caminfo_ioctl(struct file *file, unsigned int cmd, unsigne
 		ret = is_vender_test_sensor_cmd_enable_sensor_test(ioctl_cmd.data);
 		break;
 #endif
-#ifdef USE_MIPI_PHY_TUNING
+//#ifdef USE_MIPI_PHY_TUNING
 	case CAMINFO_CMD_ID_SET_MIPI_PHY:
-		ret = is_vender_caminfo_cmd_set_mipi_phy(ioctl_cmd.data);
+		if (is_vendor_use_mipi_phy_tuning()) {
+			ret = is_vender_caminfo_cmd_set_mipi_phy(ioctl_cmd.data);
+		} else {
+			ret = -EINVAL;
+		}
 		break;
 	case CAMINFO_CMD_ID_GET_MIPI_PHY:
-		ret = is_vender_caminfo_cmd_get_mipi_phy(ioctl_cmd.data);
+		if (is_vendor_use_mipi_phy_tuning()) {
+			ret = is_vender_caminfo_cmd_get_mipi_phy(ioctl_cmd.data);
+		} else {
+			ret = -EINVAL;
+		}
 		break;
-#endif
+//#endif
 	default:
 		err("%s : not support cmd number:%u, arg:%x", __func__, ioctl_cmd.cmd, arg);
 		ret = -EINVAL;

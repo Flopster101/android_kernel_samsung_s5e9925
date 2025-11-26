@@ -28,6 +28,7 @@
 #include "is-i2c-config.h"
 #include "is-vender.h"
 #include "is-time.h"
+#include "is-vendor-config.h"
 
 static int acquire_shared_rsc(struct exynos_sensor_pin *pin_ctrls)
 {
@@ -142,7 +143,7 @@ static int is_module_regulator_ctrl(struct is_module_regulator *imr,
 		}
 
 #ifdef CAMERA_RETENTION_SHARE_POWER
-		if (!strcmp(name, CAMERA_RETENTION_SHARE_POWER)
+		if (!strcmp(name, is_vendor_get_camera_retention_share_power())
 			&& (module->ext.use_retention_mode == SENSOR_RETENTION_ACTIVATED
 				|| module->ext.use_retention_mode == SENSOR_RETENTION_UNSUPPORTED)) {
 			mwarn("[%s] regulator(%s) is retention IO pin\n",

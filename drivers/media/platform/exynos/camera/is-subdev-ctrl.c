@@ -1017,13 +1017,18 @@ static int is_subdev_internal_alloc_buffer(struct is_subdev *subdev)
 
 #if defined(USE_CAMERA_HEAP)
 	memset(heapname, '\0', sizeof(heapname));
-#if defined(USE_CAMERA_HEAP_FOR_ALL)
-	if (core->scenario != IS_SCENARIO_SECURE)
-		strcpy(heapname, CAMERA_HEAP_NAME);
-#else
-	if (core->scenario != IS_SCENARIO_SECURE && subdev->instance == 0)
-		strcpy(heapname, CAMERA_HEAP_NAME);
-#endif
+//#if defined(USE_CAMERA_HEAP_FOR_ALL)
+	if (is_vendor_use_camera_heap_for_all()) {
+		if (core->scenario != IS_SCENARIO_SECURE)
+			strcpy(heapname, CAMERA_HEAP_NAME);
+		} else {
+			if (core->scenario != IS_SCENARIO_SECURE && subdev->instance == 0)
+				strcpy(heapname, CAMERA_HEAP_NAME);
+		}
+//#else
+//	if (core->scenario != IS_SCENARIO_SECURE && subdev->instance == 0)
+//		strcpy(heapname, CAMERA_HEAP_NAME);
+//#endif
 #endif
 
 	for (i = 0; i < subdev->buffer_num; i++) {

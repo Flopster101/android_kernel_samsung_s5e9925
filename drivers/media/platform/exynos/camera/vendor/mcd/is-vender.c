@@ -1796,13 +1796,15 @@ static int is_ischain_loadcalb(struct is_core *core,
 				0xFF,
 				cal_size - finfo->rom_header_cal_data_start_addr);
 
-#ifdef USE_CAMERA_CHECK_EEPROM_STATUS
-			if (test_bit(IS_ROM_STATE_FINAL_MODULE, &finfo->rom_state)) {
-				clear_bit(IS_ROM_STATE_CAL_READ_DONE, &finfo->rom_state);
-				err("Camera %d: CRC32 error. make camera fail for final module!!", rom_id);
-				ret = -EIO;
+//#ifdef USE_CAMERA_CHECK_EEPROM_STATUS
+			if (is_vendor_use_camera_check_eeprom_status()) {
+				if (test_bit(IS_ROM_STATE_FINAL_MODULE, &finfo->rom_state)) {
+					clear_bit(IS_ROM_STATE_CAL_READ_DONE, &finfo->rom_state);
+					err("Camera %d: CRC32 error. make camera fail for final module!!", rom_id);
+					ret = -EIO;
+				}
 			}
-#endif
+//#endif
 		} else {
 			err("Camera %d: CRC32 error for all section.", rom_id);
 			memset((void *)(cal_ptr), 0xFF, cal_size);

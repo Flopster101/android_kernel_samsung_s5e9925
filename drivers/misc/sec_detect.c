@@ -90,15 +90,21 @@ static inline void setup_camera_params(void) {
 	switch (g_sec_current_device) {
 	case SEC_R0S:
 		mcd_feat_flags[MCD_TYPE_RSV_V01] = true;
+		mcd_feat_flags[MCD_OIS_HALL_DATA_FOR_VDIS] = true;
 		break;
 	case SEC_G0S:
 		mcd_feat_flags[MCD_TYPE_RSV_V02] = true;
+		mcd_feat_flags[MCD_OIS_HALL_DATA_FOR_VDIS] = true;
 		break;
 	case SEC_B0S:
 		mcd_feat_flags[MCD_TYPE_RSV_V03] = true;
+		mcd_feat_flags[MCD_OIS_HALL_DATA_FOR_VDIS] = true;
 		break;
 	case SEC_R11S:
-		// S23 FE camera features - TODO
+		mcd_feat_flags[MCD_CAMERA_CHECK_EEPROM_STATUS] = true;
+		mcd_feat_flags[MCD_CAMERA_MIPI_PHY_TUNING] = true;
+		mcd_feat_flags[MCD_CAMERA_HEAP_FOR_ALL] = true;
+		// MCD_OIS_HALL_DATA_FOR_VDIS is false for r11s
 		break;
 	default:
 		break;

@@ -25,6 +25,7 @@
 #include "is-helper-i2c.h"
 
 #include "interface/is-interface-library.h"
+#include "is-vendor-config.h"
 
 #define AK737X_DEFAULT_FIRST_POSITION		960  /* 12bits */
 #define AK737X_DEFAULT_FIRST_DELAY			2000
@@ -301,8 +302,11 @@ static int sensor_ak737x_soft_landing_on_recording(struct v4l2_subdev *subdev)
 #if defined(AK737X_SOFT_LANDING_DELAY_ON_DIRECTORS_VIEW)
 	else {
 		if (actuator->sensor_peri->cis.cis_data->is_data.scene_mode == AA_SCENE_MODE_DIRECTORS_VIEW) {
-			info("[%s] delay before sleep mode\n", __func__);
-			msleep(AK737X_SOFT_LANDING_DELAY_ON_DIRECTORS_VIEW);
+			u32 delay = is_vendor_get_ak737x_soft_landing_delay();
+			if (delay > 0) {
+				info("[%s] delay before sleep mode\n", __func__);
+				msleep(delay);
+			}
 		}
 	}
 #endif

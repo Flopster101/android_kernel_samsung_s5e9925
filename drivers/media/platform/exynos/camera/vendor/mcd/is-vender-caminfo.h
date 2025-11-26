@@ -159,7 +159,7 @@ struct caminfo_enable_sensor_test {
 };
 #endif
 
-#ifdef USE_MIPI_PHY_TUNING
+//#ifdef USE_MIPI_PHY_TUNING
 #define MIPI_PHY_DATA_MAX_SIZE 3000
 struct caminfo_mipi_phy_data {
 	uint32_t position;
@@ -200,7 +200,7 @@ static struct caminfo_mipi_phy_reg caminfo_mipi_phy_reg_list[MIPI_PHY_REG_MAX_SI
 	{0x009c, "SD_CRC_DLY_CON3"},
 	{0x0000, "SD_GNR_CON0"},
 };
-#endif
+//#endif
 
 typedef struct
 {

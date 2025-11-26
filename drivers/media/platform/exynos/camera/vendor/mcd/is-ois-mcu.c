@@ -3331,7 +3331,7 @@ request_err:
 	return ret;
 }
 
-#if defined(USE_OIS_HALL_DATA_FOR_VDIS)
+//#if defined(USE_OIS_HALL_DATA_FOR_VDIS)
 int ois_mcu_get_hall_data(struct v4l2_subdev *subdev, struct is_ois_hall_data *halldata)
 {
 	int ret = 0;
@@ -3341,6 +3341,11 @@ int ois_mcu_get_hall_data(struct v4l2_subdev *subdev, struct is_ois_hall_data *h
 	int val_sum = 0;
 
 	WARN_ON(!subdev);
+
+	if (!is_vendor_use_ois_hall_data_for_vdis()) {
+		err("%s: OIS hall data for VDIS is not enabled for this device", __func__);
+		return -ENOTSUPP;
+	}
 
 	mcu = (struct ois_mcu_dev *)v4l2_get_subdevdata(subdev);
 	if(!mcu) {
@@ -3458,8 +3463,9 @@ int ois_mcu_get_hall_data(struct v4l2_subdev *subdev, struct is_ois_hall_data *h
 
 	return ret;
 }
-#elif defined(CONFIG_OIS_HALL_DATA_PROVIDER)
-int ois_mcu_get_hall_data(struct v4l2_subdev *subdev, struct is_ois_hall_data *halldata)
+//#endif
+#if defined(CONFIG_OIS_HALL_DATA_PROVIDER)
+int ois_mcu_get_hall_data_provider(struct v4l2_subdev *subdev, struct is_ois_hall_data *halldata)
 {
 	int ret = 0;
 	struct ois_mcu_dev *mcu = NULL;
@@ -3764,8 +3770,13 @@ static struct is_ois_ops ois_ops_mcu = {
 	.ois_check_cross_talk = ois_mcu_check_cross_talk,
 	.ois_check_hall_cal = ois_mcu_check_hall_cal,
 	.ois_check_valid = ois_mcu_check_valid,
-#if defined(USE_OIS_HALL_DATA_FOR_VDIS) || defined(CONFIG_OIS_HALL_DATA_PROVIDER)
+#if defined(CONFIG_OIS_HALL_DATA_PROVIDER)
+	.ois_get_hall_data = ois_mcu_get_hall_data_provider,
+#elif defined(CONFIG_SEC_DETECT)
+//#if defined(USE_OIS_HALL_DATA_FOR_VDIS) || defined(CONFIG_OIS_HALL_DATA_PROVIDER)
+	/* Function will check at runtime if feature is enabled */
 	.ois_get_hall_data = ois_mcu_get_hall_data,
+//#endif
 #endif
 	.ois_get_active = ois_mcu_get_active,
 	.ois_read_ext_clock = ois_mcu_read_ext_clock,

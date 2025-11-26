@@ -40,6 +40,9 @@
 #ifdef CONFIG_AF_HOST_CONTROL
 #include "is-device-af.h"
 #endif
+#ifdef CONFIG_SEC_DETECT
+#include "is-vendor-config.h"
+#endif
 #include <linux/pinctrl/pinctrl.h>
 #if defined (CONFIG_OIS_USE_RUMBA_S4)
 #include "is-device-ois_s4.h"
@@ -701,6 +704,13 @@ void is_ois_get_hall_data(struct is_core *core, struct is_ois_hall_data *halldat
 {
 	struct is_device_ois *ois_device = NULL;
 	struct is_device_sensor *device = NULL;
+
+#ifdef CONFIG_SEC_DETECT
+	if (!is_vendor_use_ois_hall_data_for_vdis()) {
+		memset(halldata, 0, sizeof(*halldata));
+		return;
+	}
+#endif
 
 	ois_device = is_ois_get_device(core);
 	device = &core->sensor[0];

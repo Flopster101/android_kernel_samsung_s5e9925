@@ -517,7 +517,7 @@ p_err:
 	return ret;
 }
 
-#ifdef USE_OIS_HALL_DATA_FOR_VDIS
+//#ifdef USE_OIS_HALL_DATA_FOR_VDIS
 int is_sensor_ctl_update_hall_data(struct is_device_sensor *device,
 				struct is_sensor_ctl *module_ctl,
 				u32 dm_index, struct is_ois_hall_data *halldata)
@@ -526,6 +526,10 @@ int is_sensor_ctl_update_hall_data(struct is_device_sensor *device,
 	struct is_device_sensor_peri *sensor_peri;
 
 	FIMC_BUG(!device);
+
+	if (!is_vendor_use_ois_hall_data_for_vdis()) {
+		return -ENOTSUPP;
+	}
 
 	module = (struct is_module_enum *)v4l2_get_subdevdata(device->subdev_module);
 	if (unlikely(!module)) {
@@ -568,7 +572,7 @@ int is_sensor_ctl_update_hall_data(struct is_device_sensor *device,
 
 	return 0;
 }
-#endif
+//#endif
 
 static int is_sensor_ctl_adjust_exposure(struct is_device_sensor *device,
 				struct is_sensor_ctl *module_ctl,
@@ -727,14 +731,14 @@ void is_sensor_ctl_frame_evt(struct is_device_sensor *device)
 	struct is_device_sensor_peri *sensor_peri = NULL;
 	struct is_sensor_ctl *module_ctl = NULL;
 	cis_shared_data *cis_data = NULL;
-#ifdef USE_OIS_HALL_DATA_FOR_VDIS
+//#ifdef USE_OIS_HALL_DATA_FOR_VDIS
 	u32 hashkey;
 	uint64_t timestamp = 0;
 	struct is_ois_hall_data hall_data;
 	u32 cur_frame_duration = 0;
 	u32 ois_index = 0;
 	u32 ois_frame_number = 0;
-#endif
+//#endif
 
 	camera2_sensor_ctl_t *sensor_ctrl = NULL;
 	camera2_sensor_uctl_t *sensor_uctrl = NULL;
@@ -920,33 +924,35 @@ void is_sensor_ctl_frame_evt(struct is_device_sensor *device)
 				goto p_err;
 			}
 
-#ifdef USE_OIS_HALL_DATA_FOR_VDIS
-			cur_frame_duration = is_sensor_convert_ns_to_us(sensor_peri->cis.cur_sensor_uctrl.frameDuration);
-			/* in case of under 60fps, enable ois hall data */
-			if (cur_frame_duration >= 16666) {
-				ois_frame_number = applied_frame_number;
+//#ifdef USE_OIS_HALL_DATA_FOR_VDIS
+			if (is_vendor_use_ois_hall_data_for_vdis()) {
+				cur_frame_duration = is_sensor_convert_ns_to_us(sensor_peri->cis.cur_sensor_uctrl.frameDuration);
+				/* in case of under 60fps, enable ois hall data */
+				if (cur_frame_duration >= 16666) {
+					ois_frame_number = applied_frame_number;
 
-				if (cur_frame_duration == 16666) { /* in case of 60fps - adjust frame index*/
-					ois_frame_number += 1;
-				}
-				ois_index = ois_frame_number % EXPECT_DM_NUM;
+					if (cur_frame_duration == 16666) { /* in case of 60fps - adjust frame index*/
+						ois_frame_number += 1;
+					}
+					ois_index = ois_frame_number % EXPECT_DM_NUM;
 
-				memset(&hall_data, 0, sizeof(hall_data));
-				ret = CALL_OISOPS(sensor_peri->mcu->ois, ois_get_hall_data, sensor_peri->subdev_mcu, &hall_data);
-				if (ret < 0) {
-					err("[SEN:%d] v4l2_subdev_call(ois_get_hall_data) is fail(%d)", ret);
-					goto p_err;
-				}
+					memset(&hall_data, 0, sizeof(hall_data));
+					ret = CALL_OISOPS(sensor_peri->mcu->ois, ois_get_hall_data, sensor_peri->subdev_mcu, &hall_data);
+					if (ret < 0) {
+						err("[SEN:%d] v4l2_subdev_call(ois_get_hall_data) is fail(%d)", ret);
+						goto p_err;
+					}
 
-				hashkey = ois_frame_number % IS_TIMESTAMP_HASH_KEY;
-				timestamp = device->timestampboot[hashkey];
-				hall_data.readTimeStamp = timestamp;
+					hashkey = ois_frame_number % IS_TIMESTAMP_HASH_KEY;
+					timestamp = device->timestampboot[hashkey];
+					hall_data.readTimeStamp = timestamp;
 #ifdef CONFIG_CAMERA_USE_INTERNAL_MCU
-				hall_data.index = ois_index;
+					hall_data.index = ois_index;
 #endif
-				is_sensor_ctl_update_hall_data(device, module_ctl, ois_index, &hall_data);
+					is_sensor_ctl_update_hall_data(device, module_ctl, ois_index, &hall_data);
+				}
 			}
-#endif
+//#endif
 		}
 	}
 

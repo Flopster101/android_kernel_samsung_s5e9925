@@ -49,6 +49,10 @@ enum mcd_feat {
 	MCD_TYPE_RSV_V01,		// Camera RSV V01 type (r0s)
 	MCD_TYPE_RSV_V02,		// Camera RSV V02 type (g0s)
 	MCD_TYPE_RSV_V03,		// Camera RSV V03 type (b0s)
+	MCD_CAMERA_CHECK_EEPROM_STATUS,	// Check EEPROM status on CRC error
+	MCD_CAMERA_MIPI_PHY_TUNING,	// Enable MIPI PHY tuning ioctls
+	MCD_CAMERA_HEAP_FOR_ALL,	// Use camera heap for all allocations
+	MCD_OIS_HALL_DATA_FOR_VDIS,	// Use OIS hall data for VDIS
 	MCD_FEAT_COUNT
 };
 

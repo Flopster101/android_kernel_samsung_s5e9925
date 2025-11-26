@@ -112,8 +112,8 @@ static inline u32 is_vendor_get_source_sensor_name(void)
 		/* RSV_V03: S22 Ultra */
 		return SENSOR_NAME_S5KHM3;
 	case SEC_R11S:
-		/* S23 FE - PLACEHOLDER */
-		return SOURSE_SENSOR_NAME;
+		/* RSW_V11: S23 FE */
+		return SENSOR_NAME_S5KGN3;
 	default:
 		/* Fallback */
 		return SOURSE_SENSOR_NAME;
@@ -135,14 +135,94 @@ static inline u32 is_vendor_get_target_sensor_name(void)
 		/* RSV_V03: S22 Ultra */
 		return SENSOR_NAME_S5KHM1;
 	case SEC_R11S:
-		/* S23 FE - PLACEHOLDER */
-		return TARGET_SENSOR_NAME;
+		/* RSW_V11: S23 FE */
+		return SENSOR_NAME_S5K2LD;
 	default:
 		/* Fallback */
 		return TARGET_SENSOR_NAME;
 	}
 }
 #endif
+
+/* Helper functions for runtime feature checks */
+static inline bool is_vendor_use_camera_check_eeprom_status(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	return sec_get_mcd_feat(MCD_CAMERA_CHECK_EEPROM_STATUS);
+#else
+	return false;
+#endif
+}
+
+static inline bool is_vendor_use_mipi_phy_tuning(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	return sec_get_mcd_feat(MCD_CAMERA_MIPI_PHY_TUNING);
+#else
+	return false;
+#endif
+}
+
+static inline bool is_vendor_use_camera_heap_for_all(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	return sec_get_mcd_feat(MCD_CAMERA_HEAP_FOR_ALL);
+#else
+	return false;
+#endif
+}
+
+static inline bool is_vendor_use_ois_hall_data_for_vdis(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	return sec_get_mcd_feat(MCD_OIS_HALL_DATA_FOR_VDIS);
+#else
+	return false;
+#endif
+}
+
+/* Helper function to get camera retention share power string */
+static inline const char *is_vendor_get_camera_retention_share_power(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	enum SEC_devices device = sec_get_current_device();
+
+	switch (device) {
+	case SEC_R0S:
+	case SEC_G0S:
+	case SEC_B0S:
+		/* RSV: S22, S22+, S22 Ultra */
+		return "VDDIO_1.8V_CAM";
+	case SEC_R11S:
+		/* RSW_V11: S23 FE */
+		return "VDDIO_WIDE_1P8";
+	default:
+		/* Fallback */
+		return "VDDIO_1.8V_CAM";
+	}
+#else
+	return CAMERA_RETENTION_SHARE_POWER;
+#endif
+}
+
+/* Helper function to get AK737X soft landing delay for Directors View */
+static inline u32 is_vendor_get_ak737x_soft_landing_delay(void)
+{
+#ifdef CONFIG_SEC_DETECT
+	enum SEC_devices device = sec_get_current_device();
+
+	switch (device) {
+	case SEC_R11S:
+		/* RSW_V11: S23 FE */
+		return 40; // 40ms
+	default:
+		/* RSV: S22, S22+, S22 Ultra - no delay */
+		return 0;
+	}
+#else
+	return AK737X_SOFT_LANDING_DELAY_ON_DIRECTORS_VIEW;
+#endif
+}
 
 #endif /* CONFIG_SEC_DETECT */
 

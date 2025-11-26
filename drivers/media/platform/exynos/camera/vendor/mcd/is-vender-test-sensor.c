@@ -12,6 +12,9 @@
 #include "is-vender-test-sensor.h"
 #include "is-device-sensor-peri.h"
 #include "is-vender-caminfo.h"
+#ifdef CONFIG_SEC_DETECT
+#include "is-vendor-config.h"
+#endif
 
 #ifdef USE_SENSOR_TEST_SETTING
 #define SENSOR_ID_MAX 400
@@ -603,7 +606,7 @@ EXIT:
 }
 #endif
 
-#ifdef USE_MIPI_PHY_TUNING
+//#ifdef USE_MIPI_PHY_TUNING
 int is_vender_caminfo_cmd_set_mipi_phy(void __user *user_data)
 {
 	int ret = 0, i;
@@ -618,6 +621,14 @@ int is_vender_caminfo_cmd_set_mipi_phy(void __user *user_data)
 	struct is_device_sensor *sensor;
 	struct is_device_sensor_peri *sensor_peri;
 	struct caminfo_mipi_phy_data mipi_phy_data;
+
+#ifdef CONFIG_SEC_DETECT
+	if (!is_vendor_use_mipi_phy_tuning()) {
+		return -ENOTSUPP;
+	}
+#elif !defined(USE_MIPI_PHY_TUNING)
+	return -ENOTSUPP;
+#endif
 
 	if (copy_from_user((void *)&mipi_phy_data, user_data, sizeof(struct caminfo_mipi_phy_data))) {
 		err("%s : failed to copy data from user", __func__);
@@ -709,7 +720,9 @@ int is_vender_caminfo_cmd_set_mipi_phy(void __user *user_data)
 
 	return ret;
 }
+//#endif
 
+//#ifdef USE_MIPI_PHY_TUNING
 int is_vender_caminfo_cmd_get_mipi_phy(void __user *user_data)
 {
 	int ret = 0, i, j;
@@ -724,6 +737,14 @@ int is_vender_caminfo_cmd_get_mipi_phy(void __user *user_data)
 	struct is_device_sensor *sensor;
 	struct is_device_sensor_peri *sensor_peri;
 	struct caminfo_mipi_phy_data mipi_phy_data;
+
+#ifdef CONFIG_SEC_DETECT
+	if (!is_vendor_use_mipi_phy_tuning()) {
+		return -ENOTSUPP;
+	}
+#elif !defined(USE_MIPI_PHY_TUNING)
+	return -ENOTSUPP;
+#endif
 
 	if (copy_from_user((void *)&mipi_phy_data, user_data, sizeof(struct caminfo_mipi_phy_data))) {
 		err("%s : failed to copy data from user", __func__);
@@ -806,4 +827,4 @@ int is_vender_caminfo_cmd_get_mipi_phy(void __user *user_data)
 
 	return ret;
 }
-#endif
+//#endif
