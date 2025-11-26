@@ -203,10 +203,15 @@ obj-$(CONFIG_SPU_VERIFY)        += spu_verify/
 
 include $(srctree)/drivers/Makefile.variant1
 obj-y += regulator/pmic_class/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
-obj-y += gpu/drm/samsung/panel/s6e3fac/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
-obj-y += gpu/drm/samsung/panel/s6e3hae/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+# DECON-only panel drivers. TODO: CONVERT TO USDM
+#obj-y += gpu/drm/samsung/panel_decon/s6e3fac/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+#obj-y += gpu/drm/samsung/panel_decon/s6e3hae/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += misc/drb/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += gpu/drm/samsung/panel/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += gpu/drm/samsung/panel/s6e3fc3/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += gpu/drm/samsung/panel/s6e3fc5/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-y += gpu/drm/samsung/panel/oled_common/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+obj-$(CONFIG_SEC_PANEL_NOTIFIER_V2) += sec_panel_notifier_v2/
 obj-y += battery/charger/max77705_charger/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += samsung/debug/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 obj-y += uwb/uwb_logger/ # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT

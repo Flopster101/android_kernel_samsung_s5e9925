@@ -251,10 +251,15 @@ source "drivers/Kconfig.variant1"
 source "drivers/knox/Kconfig"
 
 source "drivers/regulator/pmic_class/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
-source "drivers/gpu/drm/samsung/panel/s6e3fac/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
-source "drivers/gpu/drm/samsung/panel/s6e3hae/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+# DECON-only panel configs. TODO: CONVERT TO USDM
+#source "drivers/gpu/drm/samsung/panel_decon/s6e3fac/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+#source "drivers/gpu/drm/samsung/panel_decon/s6e3hae/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/misc/drb/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/gpu/drm/samsung/panel/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/gpu/drm/samsung/panel/s6e3fc3/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/gpu/drm/samsung/panel/s6e3fc5/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/gpu/drm/samsung/panel/oled_common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/sec_panel_notifier_v2/Kconfig"
 source "drivers/battery/charger/max77705_charger/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/samsung/debug/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/uwb/uwb_logger/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
