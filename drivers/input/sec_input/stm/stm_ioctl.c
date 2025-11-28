@@ -16,7 +16,7 @@
 
 struct tsp_ioctl {
 	int num;
-	u8 data[PAGE_SIZE];
+	u8 data[4096];
 };
 
 static struct mutex lock;
@@ -32,7 +32,7 @@ static long tsp_ioctl_handler(struct file *file, unsigned int cmd, void __user *
 	int total;
 
 	if (!g_ts->raw_pool[0] || !g_ts->raw_pool[1] || !g_ts->raw_pool[2]) {
-		input_err(true, &g_ts->client->dev, "%s: is not allocated\n", __func__);
+		input_info(true, g_ts->dev, "%s: is not allocated\n", __func__);
 		return -ENOMEM;
 	}
 
@@ -40,7 +40,7 @@ static long tsp_ioctl_handler(struct file *file, unsigned int cmd, void __user *
 
 	if (cmd == IOCTL_TSP_MAP_READ) {
 #if 0
-		input_info(true, &g_ts->client->dev, "%s: [w] %d, [r] %d\n", __func__,
+		input_info(true, g_ts->dev, "%s: [w] %d, [r] %d\n", __func__,
 			g_ts->raw_write_index, g_ts->raw_read_index);
 #endif
 		mutex_lock(&g_ts->raw_lock);
@@ -48,7 +48,7 @@ static long tsp_ioctl_handler(struct file *file, unsigned int cmd, void __user *
 		mutex_unlock(&g_ts->raw_lock);
 		if (t.num == 0) {
 			if (copy_to_user(p, (void *)&t, sizeof(struct tsp_ioctl))) {
-				input_err(true, &g_ts->client->dev, "%s: failed to 0 copy_to_user\n",
+				input_err(true, g_ts->dev, "%s: failed to 0 copy_to_user\n",
 					__func__);
 				mutex_unlock(&lock);
 				return -EFAULT;
@@ -79,18 +79,18 @@ static long tsp_ioctl_handler(struct file *file, unsigned int cmd, void __user *
 		}
 
 		if (copy_to_user(p, (void *)&t, sizeof(struct tsp_ioctl))) {
-			input_err(true, &g_ts->client->dev, "%s: failed to copyt_to_user\n",
+			input_err(true, g_ts->dev, "%s: failed to copyt_to_user\n",
 				__func__);
 			mutex_unlock(&lock);
 			return -EFAULT;
 		}
 	} else if (cmd == IOCTL_TSP_MAP_WRITE_TEST_1) {
 		if (copy_from_user((void *)&t, p, sizeof(struct tsp_ioctl))) {
-			input_err(true, &g_ts->client->dev, "%s: failed to copyt_from_user\n", __func__);
+			input_err(true, g_ts->dev, "%s: failed to copyt_from_user\n", __func__);
 			mutex_unlock(&lock);
 			return -EFAULT;
 		}
-		input_info(true, &g_ts->client->dev, "%s: TEST_1, %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n", __func__,
+		input_info(true, g_ts->dev, "%s: TEST_1, %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n", __func__,
 				t.data[0], t.data[1], t.data[2], t.data[3], t.data[4], t.data[5],
 				t.data[6], t.data[7], t.data[8], t.data[9], t.data[10], t.data[11]);
 	}
@@ -106,13 +106,13 @@ static long tsp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 static int tsp_open(struct inode *inode, struct file *file)
 {
-	input_info(true, &g_ts->client->dev, "%s\n", __func__);
+	input_info(true, g_ts->dev, "%s\n", __func__);
 	return 0;
 }
 
 static int tsp_close(struct inode *inode, struct file *file)
 {
-	input_info(true, &g_ts->client->dev, "%s\n", __func__);
+	input_info(true, g_ts->dev, "%s\n", __func__);
 
 	g_ts->raw_write_index++;
 	if (g_ts->raw_write_index >= RAW_VEC_NUM)
@@ -198,18 +198,18 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	ts->raw_len = PAGE_SIZE;
 	ret = sysfs_create_group(&ts->sec.fac_dev->kobj, &rawdata_attr_group);
-	input_info(true, &ts->client->dev, "%s: sysfs_create_group: ret: %d\n", __func__, ret);
+	input_info(true, ts->dev, "%s: sysfs_create_group: ret: %d\n", __func__, ret);
 
 	mutex_init(&lock);
 
 	ret = misc_register(&tsp_misc);
-	input_info(true, &ts->client->dev, "%s: misc_register: ret: %d\n", __func__, ret);
+	input_info(true, ts->dev, "%s: misc_register: ret: %d\n", __func__, ret);
 	return 0;
 }
 
 void stm_ts_rawdata_buffer_remove(struct stm_ts_data *ts)
 {
-	input_info(true, &ts->client->dev, "%s\n", __func__);
+	input_info(true, ts->dev, "%s\n", __func__);
 	if (ts->raw_pool[0])
 		vfree(ts->raw_pool[0]);
 	if (ts->raw_pool[1])

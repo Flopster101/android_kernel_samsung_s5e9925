@@ -15,7 +15,7 @@
 
 struct tsp_ioctl {
 	int num;
-	u8 data[PAGE_SIZE];
+	u8 data[4096];
 };
 
 #define IOCTL_TSP_MAP_READ	_IOR(0, 0, struct tsp_ioctl)
@@ -496,7 +496,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	unsigned int mmapdev_major3;
 	unsigned int mmapdev_major4;
 
-	input_info(true, &ts->client->dev, "%s: num: %d\n", __func__, ts->plat_data->support_rawdata_map_num);
+	input_info(true, ts->dev, "%s: num: %d\n", __func__, ts->plat_data->support_rawdata_map_num);
 
 	ts->raw_len = PAGE_SIZE;
 
@@ -504,7 +504,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	mmapdev_cdev0 = cdev_alloc();
 	alloc_ret = alloc_chrdev_region(&dev0, MINOR_BASE, MINOR_NUM0, DEV_NAME0);
 	if (alloc_ret != 0) {
-		input_info(true, &ts->client->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
+		input_info(true, ts->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
 		return -1;
 	}
 
@@ -516,7 +516,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	cdev_err = cdev_add(mmapdev_cdev0, dev0, MINOR_NUM0);
 	if (cdev_err != 0) {
-		input_info(true, &ts->client->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
+		input_info(true, ts->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
 		goto OUT2;
 	}
 
@@ -524,7 +524,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	mmapdev_cdev1 = cdev_alloc();
 	alloc_ret = alloc_chrdev_region(&dev1, MINOR_BASE, MINOR_NUM1, DEV_NAME1);
 	if (alloc_ret != 0) {
-		input_info(true, &ts->client->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
+		input_info(true, ts->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
 		return -1;
 	}
 
@@ -536,7 +536,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	cdev_err = cdev_add(mmapdev_cdev1, dev1, MINOR_NUM1);
 	if (cdev_err != 0) {
-		input_info(true, &ts->client->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
+		input_info(true, ts->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
 		goto OUT2;
 	}
 
@@ -544,7 +544,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	mmapdev_cdev2 = cdev_alloc();
 	alloc_ret = alloc_chrdev_region(&dev2, MINOR_BASE, MINOR_NUM2, DEV_NAME2);
 	if (alloc_ret != 0) {
-		input_info(true, &ts->client->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
+		input_info(true, ts->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
 		return -1;
 	}
 
@@ -556,7 +556,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	cdev_err = cdev_add(mmapdev_cdev2, dev2, MINOR_NUM2);
 	if (cdev_err != 0) {
-		input_info(true, &ts->client->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
+		input_info(true, ts->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
 		goto OUT2;
 	}
 
@@ -564,7 +564,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	mmapdev_cdev3 = cdev_alloc();
 	alloc_ret = alloc_chrdev_region(&dev3, MINOR_BASE, MINOR_NUM3, DEV_NAME3);
 	if (alloc_ret != 0) {
-		input_info(true, &ts->client->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
+		input_info(true, ts->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
 		return -1;
 	}
 
@@ -576,7 +576,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	cdev_err = cdev_add(mmapdev_cdev3, dev3, MINOR_NUM3);
 	if (cdev_err != 0) {
-		input_info(true, &ts->client->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
+		input_info(true, ts->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
 		goto OUT2;
 	}
 
@@ -584,7 +584,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	mmapdev_cdev4 = cdev_alloc();
 	alloc_ret = alloc_chrdev_region(&dev4, MINOR_BASE, MINOR_NUM4, DEV_NAME4);
 	if (alloc_ret != 0) {
-		input_info(true, &ts->client->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
+		input_info(true, ts->dev, "%s: alloc_chrdev_region = %d\n", __func__, alloc_ret);
 		return -1;
 	}
 
@@ -596,14 +596,14 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 
 	cdev_err = cdev_add(mmapdev_cdev4, dev4, MINOR_NUM4);
 	if (cdev_err != 0) {
-		input_info(true, &ts->client->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
+		input_info(true, ts->dev, "%s: cdev_add = %d\n", __func__, cdev_err);
 		goto OUT2;
 	}
 
 	/* class create */
 	mmapdev_class = class_create(THIS_MODULE, "mmap_device");
 	if (IS_ERR(mmapdev_class)) {
-		input_info(true, &ts->client->dev, "%s: class_create\n", __func__);
+		input_info(true, ts->dev, "%s: class_create\n", __func__);
 		goto OUT;
 	}
 
@@ -616,7 +616,7 @@ int stm_ts_rawdata_init(struct stm_ts_data *ts)
 	device_create(mmapdev_class, NULL, MKDEV(mmapdev_major4, MINOR_BASE), NULL, DEV_NAME4);
 
 
-	input_info(true, &ts->client->dev, "%s: done", __func__);
+	input_info(true, ts->dev, "%s: done", __func__);
 
 	tsp_ioctl_init();
 	return 0;
@@ -638,7 +638,7 @@ OUT2:
 
 void stm_ts_rawdata_buffer_remove(struct stm_ts_data *ts)
 {
-	input_info(true, &ts->client->dev, "%s\n", __func__);
+	input_info(true, ts->dev, "%s\n", __func__);
 	kfree(ts->raw);
 	kfree(ts->raw_u8);
 

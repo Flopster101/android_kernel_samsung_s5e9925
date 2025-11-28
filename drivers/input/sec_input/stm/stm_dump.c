@@ -18,11 +18,11 @@ void stm_ts_check_rawdata(struct work_struct *work)
 	struct stm_ts_data *ts = container_of(work, struct stm_ts_data, check_rawdata.work);
 
 	if (ts->tsp_dump_lock == 1) {
-		input_err(true, &ts->client->dev, "%s: ignored ## already checking..\n", __func__);
+		input_err(true, ts->dev, "%s: ignored ## already checking..\n", __func__);
 		return;
 	}
-	if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-		input_err(true, &ts->client->dev, "%s: ignored ## IC is power off\n", __func__);
+	if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+		input_err(true, ts->dev, "%s: ignored ## IC is power off\n", __func__);
 		return;
 	}
 
@@ -47,16 +47,16 @@ void stm_ts_sponge_dump_flush(struct stm_ts_data *ts, int dump_area)
 {
 	int i, ret;
 	unsigned char *sec_spg_dat;
-	input_info(true, &ts->client->dev, "%s: ++\n", __func__);
+	input_info(true, ts->dev, "%s: ++\n", __func__);
 
 	sec_spg_dat = vmalloc(SEC_TS_MAX_SPONGE_DUMP_BUFFER);
 	if (!sec_spg_dat) {
-		input_err(true, &ts->client->dev, "%s : Failed!!\n", __func__);
+		input_err(true, ts->dev, "%s : Failed!!\n", __func__);
 		return;
 	}
 	memset(sec_spg_dat, 0, SEC_TS_MAX_SPONGE_DUMP_BUFFER);
 
-	input_info(true, &ts->client->dev, "%s: dump area=%d\n", __func__, dump_area);
+	input_info(true, ts->dev, "%s: dump area=%d\n", __func__, dump_area);
 
 	/* check dump area */
 	if (dump_area == 0) {
@@ -70,7 +70,7 @@ void stm_ts_sponge_dump_flush(struct stm_ts_data *ts, int dump_area)
 	/* dump all events at once */
 
 	if (ts->sponge_dump_event * ts->sponge_dump_format > SEC_TS_MAX_SPONGE_DUMP_BUFFER) {
-		input_err(true, &ts->client->dev, "%s: wrong sponge dump read size (%d)\n",
+		input_err(true, ts->dev, "%s: wrong sponge dump read size (%d)\n",
 					__func__, ts->sponge_dump_event * ts->sponge_dump_format);
 		vfree(sec_spg_dat);
 		return;
@@ -78,7 +78,7 @@ void stm_ts_sponge_dump_flush(struct stm_ts_data *ts, int dump_area)
 
 	ret = ts->stm_ts_read_sponge(ts, sec_spg_dat, ts->sponge_dump_event * ts->sponge_dump_format);
 	if (ret < 0) {
-		input_err(true, &ts->client->dev, "%s: Failed to read sponge\n", __func__);
+		input_err(true, ts->dev, "%s: Failed to read sponge\n", __func__);
 		vfree(sec_spg_dat);
 		return;
 	}
@@ -104,7 +104,7 @@ void stm_ts_sponge_dump_flush(struct stm_ts_data *ts, int dump_area)
 	}
 
 	vfree(sec_spg_dat);
-	input_info(true, &ts->client->dev, "%s: --\n", __func__);
+	input_info(true, ts->dev, "%s: --\n", __func__);
 	return;
 }
 EXPORT_SYMBOL(stm_ts_sponge_dump_flush);

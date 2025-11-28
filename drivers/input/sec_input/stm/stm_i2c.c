@@ -15,12 +15,19 @@
 #if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)
 int stm_pm_runtime_get_sync(struct stm_ts_data *ts)
 {
-	return pm_runtime_get_sync(ts->client->adapter->dev.parent);
+	struct i2c_client *client;
+
+	client = (struct i2c_client *)ts->client;
+
+	return pm_runtime_get_sync(client->adapter->dev.parent);
 }
 
 void stm_pm_runtime_put_sync(struct stm_ts_data *ts)
 {
-	pm_runtime_put_sync(ts->client->adapter->dev.parent);
+	struct i2c_client *client;
+
+	client = (struct i2c_client *)ts->client;
+	pm_runtime_put_sync(client->adapter->dev.parent);
 }
 #endif
 
@@ -32,9 +39,12 @@ int stm_stui_tsp_enter(void)
 {
 	struct stm_ts_data *ts = dev_get_drvdata(ptsp);
 	int ret = 0;
+	struct i2c_client *client;
 
 	if (!ts)
 		return -EINVAL;
+
+	client = (struct i2c_client *) ts->client;
 
 #if IS_ENABLED(CONFIG_INPUT_SEC_NOTIFIER)
 	sec_input_notify(&ts->stm_input_nb, NOTIFIER_SECURE_TOUCH_ENABLE, NULL);
@@ -43,7 +53,7 @@ int stm_stui_tsp_enter(void)
 	disable_irq(ts->irq);
 	stm_ts_release_all_finger(ts);
 
-	ret = stui_i2c_lock(ts->client->adapter);
+	ret = stui_i2c_lock(client->adapter);
 	if (ret) {
 		pr_err("[STUI] stui_i2c_lock failed : %d\n", ret);
 #if IS_ENABLED(CONFIG_INPUT_SEC_NOTIFIER)
@@ -60,11 +70,14 @@ int stm_stui_tsp_exit(void)
 {
 	struct stm_ts_data *ts = dev_get_drvdata(ptsp);
 	int ret = 0;
+	struct i2c_client *client;
 
 	if (!ts)
 		return -EINVAL;
 
-	ret = stui_i2c_unlock(ts->client->adapter);
+	client = (struct i2c_client *) ts->client;
+
+	ret = stui_i2c_unlock(client->adapter);
 	if (ret)
 		pr_err("[STUI] stui_i2c_unlock failed : %d\n", ret);
 
@@ -83,7 +96,7 @@ int stm_stui_tsp_type(void)
 }
 #endif
 
-#ifdef TCLM_CONCEPT
+#if 0	//def TCLM_CONCEPT
 int stm_ts_tclm_execute_force_calibration(struct i2c_client *client, int cal_mode)
 {
 	struct stm_ts_data *ts = (struct stm_ts_data *)i2c_get_clientdata(client);
@@ -130,6 +143,13 @@ int stm_ts_tool_proc_remove(void)
 	return 0;
 }
 
+struct device *stm_ts_get_client_dev(struct stm_ts_data *ts)
+{
+	struct i2c_client *client = (struct i2c_client *)ts->client;
+
+	return &client->dev;
+}
+
 int stm_ts_read_from_sponge(struct stm_ts_data *ts, u8 *data, int length)
 {
 	int ret;
@@ -141,7 +161,7 @@ int stm_ts_read_from_sponge(struct stm_ts_data *ts, u8 *data, int length)
 	address[2] = data[0];
 	ret = ts->stm_ts_read(ts, address, 3, data, length);
 	if (ret < 0)
-		input_err(true, &ts->client->dev, "%s: fail to read sponge command\n", __func__);
+		input_err(true, ts->dev, "%s: fail to read sponge command\n", __func__);
 	mutex_unlock(&ts->sponge_mutex);
 
 	return ret;
@@ -158,20 +178,20 @@ int stm_ts_write_to_sponge(struct stm_ts_data *ts, u8 *data, int length)
 	address[2] = data[0];
 	ret = ts->stm_ts_write(ts, address, 3, &data[2], length - 2);
 	if (ret < 0)
-		input_err(true, &ts->client->dev, "%s: Failed to write offset\n", __func__);
+		input_err(true, ts->dev, "%s: Failed to write offset\n", __func__);
 
 	address[0] = STM_TS_CMD_SPONGE_NOTIFY_CMD;
 	ret = ts->stm_ts_write(ts, address, 3, NULL, 0);
 	if (ret < 0)
-		input_err(true, &ts->client->dev, "%s: Failed to send notify\n", __func__);
+		input_err(true, ts->dev, "%s: Failed to send notify\n", __func__);
 	mutex_unlock(&ts->sponge_mutex);
 
 	return ret;
-
 }
 
 int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len)
 {
+	struct i2c_client *client;
 	int ret;
 	unsigned char retry;
 	struct i2c_msg msg;
@@ -180,8 +200,10 @@ int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int le
 	u8 *buf;
 	u8 *msg_buff;
 
+	client = (struct i2c_client *)ts->client;
+
 	if (len + 1 > len_max) {
-		input_err(true, &ts->client->dev,
+		input_err(true, ts->dev,
 				"%s: The i2c buffer size is exceeded.\n", __func__);
 		return -ENOMEM;
 	}
@@ -189,22 +211,18 @@ int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int le
 	if (!ts->plat_data->resume_done.done) {
 		ret = wait_for_completion_interruptible_timeout(&ts->plat_data->resume_done, msecs_to_jiffies(500));
 		if (ret <= 0) {
-			input_err(true, &ts->client->dev, "%s: LPM: pm resume is not handled:%d\n", __func__, ret);
+			input_err(true, ts->dev, "%s: LPM: pm resume is not handled:%d\n", __func__, ret);
 			return -EIO;
 		}
 	}
 
-#if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)
-	if (atomic_read(&ts->secure_enabled) == SECURE_TOUCH_ENABLE) {
-		input_err(true, &ts->client->dev,
-				"%s: TSP no accessible from Linux, TUI is enabled!\n", __func__);
-		return -EBUSY;
-	}
-#endif
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
 	if (STUI_MODE_TOUCH_SEC & stui_get_mode())
 		return -EBUSY;
 #endif
+	if (sec_check_secure_trusted_mode_status(ts->plat_data))
+		return -EBUSY;
+
 	buf = kzalloc(cnum, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -217,27 +235,27 @@ int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int le
 		return -ENOMEM;
 	}
 
-	if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF\n", __func__);
+	if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+		input_err(true, ts->dev, "%s: POWER_STATUS : OFF\n", __func__);
 		goto err;
 	}
 
 	memcpy(msg_buff, buf, cnum);
 	memcpy(msg_buff + cnum, data, len);
 
-	msg.addr = ts->client->addr;
+	msg.addr = client->addr;
 	msg.flags = 0 | I2C_M_DMA_SAFE;
 	msg.len = len + cnum;
 	msg.buf = msg_buff;
 
 	mutex_lock(&ts->read_write_mutex);
 	for (retry = 0; retry < SEC_TS_I2C_RETRY_CNT; retry++) {
-		ret = i2c_transfer(ts->client->adapter, &msg, 1);
+		ret = i2c_transfer(client->adapter, &msg, 1);
 		if (ret == 1)
 			break;
 
-		if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-			input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
+		if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+			input_err(true, ts->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
 			mutex_unlock(&ts->read_write_mutex);
 			goto err;
 		}
@@ -246,7 +264,7 @@ int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int le
 
 		if (retry > 1) {
 			char result[32];
-			input_err(true, &ts->client->dev, "%s: I2C retry %d, ret:%d\n", __func__, retry + 1, ret);
+			input_err(true, ts->dev, "%s: I2C retry %d, ret:%d\n", __func__, retry + 1, ret);
 			ts->plat_data->hw_param.comm_err_count++;
 
 			snprintf(result, sizeof(result), "RESULT=I2C");
@@ -258,9 +276,9 @@ int stm_ts_i2c_write(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int le
 	mutex_unlock(&ts->read_write_mutex);
 
 	if (retry == SEC_TS_I2C_RETRY_CNT) {
-		input_err(true, &ts->client->dev, "%s: I2C write over retry limit\n", __func__);
+		input_err(true, ts->dev, "%s: I2C write over retry limit\n", __func__);
 		ret = -EIO;
-		if (ts->probe_done && !ts->reset_is_on_going && !ts->plat_data->shutdown_called)
+		if (ts->probe_done && !atomic_read(&ts->reset_is_on_going) && !atomic_read(&ts->plat_data->shutdown_called))
 			schedule_delayed_work(&ts->reset_work, msecs_to_jiffies(TOUCH_RESET_DWORK_TIME));
 	}
 
@@ -291,26 +309,25 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 	int i;
 	u8 *msg_buff;
 	u8 *buf;
+	struct i2c_client *client;
+
+	client = (struct i2c_client *)ts->client;
 
 	if (!ts->plat_data->resume_done.done) {
 		ret = wait_for_completion_interruptible_timeout(&ts->plat_data->resume_done, msecs_to_jiffies(500));
 		if (ret <= 0) {
-			input_err(true, &ts->client->dev, "%s: LPM: pm resume is not handled:%d\n", __func__, ret);
+			input_err(true, ts->dev, "%s: LPM: pm resume is not handled:%d\n", __func__, ret);
 			return -EIO;
 		}
 	}
 
-#if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)
-	if (atomic_read(&ts->secure_enabled) == SECURE_TOUCH_ENABLE) {
-		input_err(true, &ts->client->dev,
-				"%s: TSP no accessible from Linux, TUI is enabled!\n", __func__);
-		return -EBUSY;
-	}
-#endif
 #if IS_ENABLED(CONFIG_SAMSUNG_TUI)
 	if (STUI_MODE_TOUCH_SEC & stui_get_mode())
 		return -EBUSY;
 #endif
+	if (sec_check_secure_trusted_mode_status(ts->plat_data))
+		return -EBUSY;
+
 	buf = kzalloc(cnum, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -323,17 +340,17 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 		return -ENOMEM;
 	}
 
-	if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-		input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF\n", __func__);
+	if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+		input_err(true, ts->dev, "%s: POWER_STATUS : OFF\n", __func__);
 		goto err;
 	}
 
-	msg[0].addr = ts->client->addr;
+	msg[0].addr = client->addr;
 	msg[0].flags = 0 | I2C_M_DMA_SAFE;
 	msg[0].len = cnum;
 	msg[0].buf = buf;
 
-	msg[1].addr = ts->client->addr;
+	msg[1].addr = client->addr;
 	msg[1].flags = I2C_M_RD | I2C_M_DMA_SAFE;
 	msg[1].buf = msg_buff;
 
@@ -341,19 +358,19 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 	if (len <= ts->plat_data->i2c_burstmax) {
 		msg[1].len = len;
 		for (retry = 0; retry < SEC_TS_I2C_RETRY_CNT; retry++) {
-			ret = i2c_transfer(ts->client->adapter, msg, 2);
+			ret = i2c_transfer(client->adapter, msg, 2);
 			if (ret == 2)
 				break;
 			usleep_range(1 * 1000, 1 * 1000);
-			if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-				input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
+			if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+				input_err(true, ts->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
 				mutex_unlock(&ts->read_write_mutex);
 				goto err;
 			}
 
 			if (retry > 1) {
 				char result[32];
-				input_err(true, &ts->client->dev, "%s: I2C retry %d, ret:%d\n",
+				input_err(true, ts->dev, "%s: I2C retry %d, ret:%d\n",
 					__func__, retry + 1, ret);
 				ts->plat_data->hw_param.comm_err_count++;
 
@@ -368,18 +385,18 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 		 * So, try to seperate reading data about 256 bytes.
 		 */
 		for (retry = 0; retry < SEC_TS_I2C_RETRY_CNT; retry++) {
-			ret = i2c_transfer(ts->client->adapter, msg, 1);
+			ret = i2c_transfer(client->adapter, msg, 1);
 			if (ret == 1)
 				break;
 			usleep_range(1 * 1000, 1 * 1000);
-			if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-				input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
+			if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+				input_err(true, ts->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
 				mutex_unlock(&ts->read_write_mutex);
 				goto err;
 			}
 
 			if (retry > 1) {
-				input_err(true, &ts->client->dev, "%s: I2C retry %d, ret:%d\n",
+				input_err(true, ts->dev, "%s: I2C retry %d, ret:%d\n",
 					__func__, retry + 1, ret);
 				ts->plat_data->hw_param.comm_err_count++;
 			}
@@ -394,18 +411,18 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 			remain -= ts->plat_data->i2c_burstmax;
 
 			for (retry = 0; retry < SEC_TS_I2C_RETRY_CNT; retry++) {
-				ret = i2c_transfer(ts->client->adapter, &msg[1], 1);
+				ret = i2c_transfer(client->adapter, &msg[1], 1);
 				if (ret == 1)
 					break;
 				usleep_range(1 * 1000, 1 * 1000);
-				if (ts->plat_data->power_state == SEC_INPUT_STATE_POWER_OFF) {
-					input_err(true, &ts->client->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
+				if (atomic_read(&ts->plat_data->power_state) == SEC_INPUT_STATE_POWER_OFF) {
+					input_err(true, ts->dev, "%s: POWER_STATUS : OFF, retry:%d\n", __func__, retry);
 					mutex_unlock(&ts->read_write_mutex);
 					goto err;
 				}
 
 				if (retry > 1) {
-					input_err(true, &ts->client->dev, "%s: I2C retry %d, ret:%d\n",
+					input_err(true, ts->dev, "%s: I2C retry %d, ret:%d\n",
 						__func__, retry + 1, ret);
 					ts->plat_data->hw_param.comm_err_count++;
 				}
@@ -417,9 +434,9 @@ int stm_ts_i2c_read(struct stm_ts_data *ts, u8 *reg, int cnum, u8 *data, int len
 	mutex_unlock(&ts->read_write_mutex);
 
 	if (retry == SEC_TS_I2C_RETRY_CNT) {
-		input_err(true, &ts->client->dev, "%s: I2C read over retry limit\n", __func__);
+		input_err(true, ts->dev, "%s: I2C read over retry limit\n", __func__);
 		ret = -EIO;
-		if (ts->probe_done && !ts->reset_is_on_going && !ts->plat_data->shutdown_called)
+		if (ts->probe_done && !atomic_read(&ts->reset_is_on_going) && !atomic_read(&ts->plat_data->shutdown_called))
 			schedule_delayed_work(&ts->reset_work, msecs_to_jiffies(TOUCH_RESET_DWORK_TIME));
 	}
 
@@ -440,7 +457,7 @@ err:
 	return -EIO;
 }
 
-int stm_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+int stm_ts_i2c_init(struct i2c_client *client)
 {
 	struct stm_ts_data *ts;
 	struct sec_ts_plat_data *pdata;
@@ -477,12 +494,17 @@ int stm_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 
 	ts->client = client;
 	ts->plat_data = pdata;
+	ts->dev = &client->dev;
+#if IS_ENABLED(CONFIG_INPUT_SEC_TRUSTED_TOUCH)
+	ts->plat_data->dev =  &client->dev;
+	ts->plat_data->bus_master = &client->adapter->dev;
+#endif
 	ts->stm_ts_read = stm_ts_i2c_read;
 	ts->stm_ts_write = stm_ts_i2c_write;
 	ts->stm_ts_read_sponge = stm_ts_read_from_sponge;
 	ts->stm_ts_write_sponge = stm_ts_write_to_sponge;
 	ts->tdata = tdata;
-#ifdef TCLM_CONCEPT
+#if 0	//def TCLM_CONCEPT
 	ts->tdata->client = ts->client;
 	ts->tdata->tclm_read = stm_tclm_i2c_data_read;
 	ts->tdata->tclm_write = stm_tclm_i2c_data_write;
@@ -495,13 +517,39 @@ int stm_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	ts->plat_data->stui_tsp_exit = stm_stui_tsp_exit;
 	ts->plat_data->stui_tsp_type = stm_stui_tsp_type;
 #endif
-	ret = stm_ts_probe(ts);
+	ret = stm_ts_init(ts);
+	if (ret < 0) {
+		input_err(true, ts->dev, "%s: fail to init resource\n", __func__);
+		return ret;
+	}
+	ret = 0;
 	return ret;
 
 error_allocate_tdata:
 error_allocate_pdata:
 error_allocate_mem:
 	return ret;
+}
+
+int stm_ts_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+{
+	struct stm_ts_data *ts;
+	int ret = 0;
+
+	input_info(true, &client->dev, "%s\n", __func__);
+
+	ret = stm_ts_i2c_init(client);
+	if (ret < 0) {
+		input_err(true, &client->dev, "%s: fail to init resource\n", __func__);
+		return ret;
+	}
+
+	ts = i2c_get_clientdata(client);
+	if (!ts->plat_data->work_queue_probe_enabled)
+		return stm_ts_probe(ts->dev);
+
+	queue_work(ts->plat_data->probe_workqueue, &ts->plat_data->probe_work);
+	return 0;
 }
 
 int stm_ts_i2c_remove(struct i2c_client *client)
@@ -520,7 +568,6 @@ void stm_ts_i2c_shutdown(struct i2c_client *client)
 
 	stm_ts_shutdown(ts);
 }
-
 
 #if IS_ENABLED(CONFIG_PM)
 static int stm_ts_i2c_pm_suspend(struct device *dev)
