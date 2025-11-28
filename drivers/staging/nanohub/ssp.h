@@ -791,6 +791,7 @@ struct ssp_data {
 	char registerValue[REGISTER_RW_BUFFER_MAX + 3];
 	u8 dhrAccelScaleRange;
 	bool resetting;
+	bool mcu_unavailable;
 
 /* variables for timestamp sync */
 	struct delayed_work work_ssp_tiemstamp_sync;

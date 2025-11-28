@@ -48,11 +48,15 @@ bool sec_get_mcd_feat(enum mcd_feat feat) {
 EXPORT_SYMBOL_GPL(sec_get_mcd_feat);
 
 static bool g_detection_complete = false;
+static bool g_sec_uses_ssp_sensorhub = false;
 
 bool sec_is_detection_complete(void) {
     return g_detection_complete;
 }
 EXPORT_SYMBOL_GPL(sec_is_detection_complete);
+
+bool sec_feat_uses_ssp_sensorhub(void) { return g_sec_uses_ssp_sensorhub; }
+EXPORT_SYMBOL_GPL(sec_feat_uses_ssp_sensorhub);
 
 #ifdef CONFIG_SEC_DETECT_SYSFS
 // Sysfs attribute to show the current device name
@@ -149,18 +153,22 @@ static int __init sec_detect_init(void) {
 	if (strstr(machine_name, "R0S") != NULL) {
 		g_sec_current_device = SEC_R0S;
 		strscpy(g_sec_current_device_name, "r0s", sizeof(g_sec_current_device_name));
+		g_sec_uses_ssp_sensorhub = true;  // S22 uses SSP sensorhub
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
 	} else if (strstr(machine_name, "G0S") != NULL) {
 		g_sec_current_device = SEC_G0S;
 		strscpy(g_sec_current_device_name, "g0s", sizeof(g_sec_current_device_name));
+		g_sec_uses_ssp_sensorhub = true;  // S22+ uses SSP sensorhub
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
 	} else if (strstr(machine_name, "B0S") != NULL) {
 		g_sec_current_device = SEC_B0S;
 		strscpy(g_sec_current_device_name, "b0s", sizeof(g_sec_current_device_name));
+		g_sec_uses_ssp_sensorhub = true;  // S22 Ultra uses SSP sensorhub
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
 	} else if (strstr(machine_name, "R11S") != NULL) {
 		g_sec_current_device = SEC_R11S;
 		strscpy(g_sec_current_device_name, "r11s", sizeof(g_sec_current_device_name));
+		g_sec_uses_ssp_sensorhub = false;  // r11s uses SHUB sensorhub, not SSP sensorhub
 		// sec_feat_flags[SEC_FEAT_DOZE] = true;
 	}
 

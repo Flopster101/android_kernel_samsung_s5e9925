@@ -24,6 +24,7 @@
 #endif
 #include <linux/sec_debug.h>
 #include <linux/sec_batt.h>
+#include <linux/sec_detect.h>
 #include "chub.h"
 #include "ipc_chub.h"
 
@@ -647,6 +648,13 @@ static int ssp_probe(struct platform_device *pdev)
 	int iRet = 0;
 
 	pr_info("[SSP] %s, is called\n", __func__);
+
+	/* Check if this device uses SSP sensorhub */
+	if (!sec_feat_uses_ssp_sensorhub()) {
+		pr_info("[SSP] %s: SSP sensorhub not used on this device, skipping probe\n", __func__);
+		kfree(data);
+		return 0;
+	}
 
 	p_ssp_data = data;
 	p_ssp_data->pdev = pdev;

@@ -79,6 +79,10 @@ int ssp_on_mcu_ready(void *ssh_data, bool ready)
 
 	if (ready == true) {
 		/* Start queue work for initializing MCU */
+		if (data->mcu_unavailable) {
+			pr_info("[SSP] MCU unavailable, skipping initialization\n");
+			return 0;
+		}
 		data->bFirstRef == true ? data->bFirstRef = false : data->uResetCnt++;
 		memset(&ssp_pkt, 0, sizeof(ssp_pkt));
 		wake_lock_timeout(data->ssp_wake_lock, HZ);
@@ -147,6 +151,12 @@ void ssp_mcu_ready_work_func(struct work_struct *work)
 	int ret = 0;
 	int retries = 0;
 
+	/* If MCU initialization has permanently failed, don't retry */
+	if (data->mcu_unavailable) {
+		pr_info("[SSP] MCU unavailable, skipping initialization\n");
+		return;
+	}
+
 	ret = wait_for_completion_timeout(&data->hub_data->mcu_init_done, COMPLETION_TIMEOUT);
 
 	if (unlikely(!ret))
@@ -163,7 +173,8 @@ retries:
 	if (ret != SUCCESS) {
 		msleep(100);
 		if (++retries > 3) {
-			pr_err("[SSP] fail to initialize mcu\n");
+			pr_err("[SSP] fail to initialize mcu, marking as unavailable\n");
+			data->mcu_unavailable = true;
 			ssp_enable(data, false);
                         data->resetting = false;
 			return;

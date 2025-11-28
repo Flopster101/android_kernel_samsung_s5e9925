@@ -60,5 +60,7 @@ bool sec_get_mcd_feat(enum mcd_feat feat);
 
 bool sec_is_detection_complete(void);
 
+bool sec_feat_uses_ssp_sensorhub(void);
+
 #endif /* _LINUX_SEC_H */
 
