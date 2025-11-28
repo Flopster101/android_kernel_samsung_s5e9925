@@ -11,6 +11,8 @@ nanohub-$(CONFIG_SENSOR_DRV) += main.o comms.o
 # Makefile for the sensor drivers.
 #
 
+nanohub-$(CONFIG_SHUB_LSI) += chub_shub.o
+
 # Each configuration option enables a list of files.
 
 nanohub-$(CONFIG_SENSORS_SSP) += ssp_dev.o ssp_i2c.o ssp_data.o ssp_sysfs.o\
