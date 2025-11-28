@@ -14,6 +14,12 @@
 
 struct stm_ts_data *g_ts;
 
+/* Weak stub for I2C version  */
+void __weak stm_ts_set_spi_mode(struct stm_ts_data *ts)
+{
+	// No-op for I2C
+}
+
 #if IS_ENABLED(CONFIG_INPUT_SEC_SECURE_TOUCH)
 static irqreturn_t secure_filter_interrupt(struct stm_ts_data *ts)
 {

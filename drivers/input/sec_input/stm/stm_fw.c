@@ -737,7 +737,6 @@ done:
 exit_fwload:
 	return retval;
 }
-EXPORT_SYMBOL(stm_ts_fw_update_on_probe);
 
 static int stm_ts_load_fw_from_kernel(struct stm_ts_data *ts)
 {
@@ -952,5 +951,4 @@ int stm_ts_fw_update_on_hidden_menu(struct stm_ts_data *ts, int update_type)
 #endif
 	return retval;
 }
-EXPORT_SYMBOL(stm_ts_fw_update_on_hidden_menu);
 MODULE_LICENSE("GPL");

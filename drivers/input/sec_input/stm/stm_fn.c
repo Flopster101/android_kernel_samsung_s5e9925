@@ -1130,7 +1130,6 @@ void stm_ts_set_cover_type(struct stm_ts_data *ts, bool enable)
 	}
 
 }
-EXPORT_SYMBOL(stm_ts_set_cover_type);
 
 int stm_ts_set_temperature(struct device *dev, u8 temperature_data)
 {

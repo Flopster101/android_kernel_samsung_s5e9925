@@ -3742,7 +3742,6 @@ int stm_ts_get_tsp_test_result(struct stm_ts_data *ts)
 err_read:
 	return ret;
 }
-EXPORT_SYMBOL(stm_ts_get_tsp_test_result);
 
 static void get_tsp_test_result(void *device_data)
 {
