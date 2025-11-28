@@ -1108,17 +1108,17 @@ struct fifo_chip {
 #define AMSDRIVER_FLICKER_DISABLE 0
 
 #if IS_ENABLED(CONFIG_ARCH_EXYNOS)
-extern int sensors_create_symlink(struct input_dev *inputdev);
-extern void sensors_remove_symlink(struct input_dev *inputdev);
-extern int sensors_register(struct device **dev, void *drvdata,
+extern int ssp_sensors_create_symlink(struct input_dev *inputdev);
+extern void ssp_sensors_remove_symlink(struct input_dev *inputdev);
+extern int ssp_sensors_register(struct device **dev, void *drvdata,
 struct device_attribute *attributes[], char *name);
 #else
-extern int sensors_create_symlink(struct kobject *target, const char *name);
-extern void sensors_remove_symlink(struct kobject *target, const char *name);
-extern int sensors_register(struct device **dev, void *drvdata,
+extern int ssp_sensors_create_symlink(struct kobject *target, const char *name);
+extern void ssp_sensors_remove_symlink(struct kobject *target, const char *name);
+extern int ssp_sensors_register(struct device **dev, void *drvdata,
 struct device_attribute *attributes[], char *name);
 #endif
-extern void sensors_unregister(struct device *dev,
+extern void ssp_sensors_unregister(struct device *dev,
 struct device_attribute *attributes[]);
 
 #endif /* __AMS_TSL2510_H */

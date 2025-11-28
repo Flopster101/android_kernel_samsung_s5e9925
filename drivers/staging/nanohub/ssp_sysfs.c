@@ -1217,12 +1217,12 @@ static struct file_operations const ssp_data_injection_fops = {
 
 static void initialize_mcu_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->mcu_device, data, mcu_attrs, "ssp_sensor");
+	ssp_sensors_register(&data->mcu_device, data, mcu_attrs, "ssp_sensor");
 }
 
 static void remove_mcu_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->mcu_device, mcu_attrs);
+	ssp_sensors_unregister(data->mcu_device, mcu_attrs);
 }
 
 int initialize_sysfs(struct ssp_data *data)
@@ -1288,5 +1288,5 @@ void remove_sysfs(struct ssp_data *data)
 
 	remove_thremistor_factorytest(data);
 
-	destroy_sensor_class();
+	ssp_destroy_sensor_class();
 }

@@ -519,9 +519,9 @@ void stk3a8x_get_reg_default_setting(uint8_t reg, uint16_t* value);
 int32_t stk3a8x_update_registry(struct stk3a8x_data *alps_data);
 
 
-int sensors_register(struct device **dev, void *drvdata,
+int shub_sensors_register(struct device **dev, void *drvdata,
 	struct device_attribute *attributes[], char *name);
-void sensors_unregister(struct device * const dev,
+void shub_sensors_unregister(struct device * const dev,
 	struct device_attribute *attributes[]);
 
 #define vfs_read(a, b, c, d)

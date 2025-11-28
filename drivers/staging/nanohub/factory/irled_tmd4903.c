@@ -121,10 +121,10 @@ static struct device_attribute *irled_attrs[] = {
 
 void initialize_irled_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->irled_device, data, irled_attrs, "irled_remote");
+	ssp_sensors_register(&data->irled_device, data, irled_attrs, "irled_remote");
 }
 
 void remove_irled_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->irled_device, irled_attrs);
+	ssp_sensors_unregister(data->irled_device, irled_attrs);
 }

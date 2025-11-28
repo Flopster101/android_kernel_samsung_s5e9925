@@ -15,10 +15,10 @@
 #include <linux/err.h>
 #include <linux/input.h>
 
-int sensors_create_symlink(struct input_dev *inputdev);
-void sensors_remove_symlink(struct input_dev *inputdev);
-int sensors_register(struct device **pdev, void *drvdata, struct device_attribute *attributes[], char *name);
-void sensors_unregister(struct device *dev, struct device_attribute *attributes[]);
-void destroy_sensor_class(void);
+int ssp_sensors_create_symlink(struct input_dev *inputdev);
+void ssp_sensors_remove_symlink(struct input_dev *inputdev);
+int ssp_sensors_register(struct device **pdev, void *drvdata, struct device_attribute *attributes[], char *name);
+void ssp_sensors_unregister(struct device *dev, struct device_attribute *attributes[]);
+void ssp_destroy_sensor_class(void);
 
 #endif

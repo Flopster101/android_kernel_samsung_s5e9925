@@ -107,7 +107,7 @@
 #include <linux/of_platform.h>
 
 #ifdef CONFIG_SENSORS_VL53L5_SLSI
-extern int sensors_register(struct device **dev, void *drvdata,
+extern int ssp_sensors_register(struct device **dev, void *drvdata,
 	struct device_attribute *attributes[], char *name);
 #endif
 
@@ -2035,7 +2035,7 @@ int vl53l5_k_spi_probe(struct spi_device *spi)
 	}
 
 	if (init_global_module == false) {
-		status = sensors_register(&p_module->factory_device,
+		status = ssp_sensors_register(&p_module->factory_device,
 			p_module, sensor_attrs, MODULE_NAME);
 
 		if (status) {
@@ -2050,7 +2050,7 @@ int vl53l5_k_spi_probe(struct spi_device *spi)
 
 	{
 		int ret;
-		ret = sensordump_notifier_register(&p_module->dump_nb);
+		ret = ssp_sensordump_notifier_register(&p_module->dump_nb);
 		vl53l5_k_log_info("notifier %d", ret);
 	}
 	//----- for sec dump
@@ -2578,7 +2578,7 @@ static int __init vl53l5_k_init(void)
 		goto done;
 	}
 	if (global_p_module != NULL) {
-		status = sensors_register(&global_p_module->factory_device,
+		status = ssp_sensors_register(&global_p_module->factory_device,
 			global_p_module, sensor_attrs, MODULE_NAME);
 
 		if (status)

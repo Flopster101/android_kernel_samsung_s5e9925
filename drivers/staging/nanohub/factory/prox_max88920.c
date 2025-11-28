@@ -492,11 +492,11 @@ static struct device_attribute *prox_attrs[] = {
 
 void initialize_prox_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->prox_device, data,
+	ssp_sensors_register(&data->prox_device, data,
 		prox_attrs, "proximity_sensor");
 }
 
 void remove_prox_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->prox_device, prox_attrs);
+	ssp_sensors_unregister(data->prox_device, prox_attrs);
 }

@@ -798,11 +798,11 @@ void initialize_prox_factorytest(struct ssp_data *data)
 #ifdef CONFIG_SENSORS_STK33915
 	push_back(&prox_manager, "STK33915", get_prox_stk33915());
 #endif
-	sensors_register(&data->prox_device, data,
+	ssp_sensors_register(&data->prox_device, data,
 		prox_attrs, "proximity_sensor");
 }
 
 void remove_prox_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->prox_device, prox_attrs);
+	ssp_sensors_unregister(data->prox_device, prox_attrs);
 }

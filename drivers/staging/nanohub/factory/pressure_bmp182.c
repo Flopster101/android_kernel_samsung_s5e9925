@@ -214,13 +214,13 @@ void initialize_pressure_factorytest(struct ssp_data *data)
 {
 #if defined(LPS25H_REV)
 	if (data->ap_rev >= LPS25H_REV)
-		sensors_register(&data->prs_device, data, pressure_attrs_lps25h,
+		ssp_sensors_register(&data->prs_device, data, pressure_attrs_lps25h,
 			"barometer_sensor");
 	else
-		sensors_register(&data->prs_device, data, pressure_attrs,
+		ssp_sensors_register(&data->prs_device, data, pressure_attrs,
 			"barometer_sensor");
 #else
-	sensors_register(&data->prs_device, data, pressure_attrs,
+	ssp_sensors_register(&data->prs_device, data, pressure_attrs,
 		"barometer_sensor");
 #endif
 }
@@ -229,10 +229,10 @@ void remove_pressure_factorytest(struct ssp_data *data)
 {
 #if defined(LPS25H_REV)
 	if (data->ap_rev >= LPS25H_REV)
-		sensors_unregister(data->prs_device, pressure_attrs_lps25h);
+		ssp_sensors_unregister(data->prs_device, pressure_attrs_lps25h);
 	else
-		sensors_unregister(data->prs_device, pressure_attrs);
+		ssp_sensors_unregister(data->prs_device, pressure_attrs);
 #else
-	sensors_unregister(data->prs_device, pressure_attrs);
+	ssp_sensors_unregister(data->prs_device, pressure_attrs);
 #endif
 }

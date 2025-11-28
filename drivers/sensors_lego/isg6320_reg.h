@@ -247,9 +247,9 @@ static const struct isg6320_reg_data setup_reg[MAX_REGISTRY_CNT] = {
 };
 
 #ifndef CONFIG_SENSORS_CORE_AP
-extern int sensors_create_symlink(struct input_dev *inputdev);
-extern void sensors_remove_symlink(struct input_dev *inputdev);
-extern int sensors_register(struct device **dev, void *drvdata,
+extern int ssp_sensors_create_symlink(struct input_dev *inputdev);
+extern void ssp_sensors_remove_symlink(struct input_dev *inputdev);
+extern int ssp_sensors_register(struct device **dev, void *drvdata,
 			    struct device_attribute *attributes[], char *name);
 extern void sensors_unregister(struct device *dev,
 			       struct device_attribute *attributes[]);

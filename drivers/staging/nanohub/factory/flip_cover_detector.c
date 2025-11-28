@@ -460,7 +460,7 @@ static struct device_attribute *fcd_attrs[] = {
 void initialize_fcd_factorytest(struct ssp_data *data)
 {
 	factory_data = kzalloc(sizeof(*factory_data), GFP_KERNEL);
-	sensors_register(&data->fcd_device, data,
+	ssp_sensors_register(&data->fcd_device, data,
 		fcd_attrs, "flip_cover_detector_sensor");
 
 	INIT_DELAYED_WORK(&data->fcd_notifier_work, notify_fcd_status);
@@ -474,5 +474,5 @@ void initialize_fcd_factorytest(struct ssp_data *data)
 void remove_fcd_factorytest(struct ssp_data *data)
 {
 	cancel_delayed_work(&data->fcd_notifier_work);
-	sensors_unregister(data->fcd_device, fcd_attrs);
+	ssp_sensors_unregister(data->fcd_device, fcd_attrs);
 }

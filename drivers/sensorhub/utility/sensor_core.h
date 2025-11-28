@@ -31,19 +31,19 @@
 #include <linux/err.h>
 #include <linux/input.h>
 
-int sensors_create_symlink(struct input_dev *inputdev);
-void sensors_remove_symlink(struct input_dev *inputdev);
-int sensors_register(struct device **pdev, void *drvdata,
+int shub_sensors_create_symlink(struct input_dev *inputdev);
+void shub_sensors_remove_symlink(struct input_dev *inputdev);
+int shub_sensors_register(struct device **pdev, void *drvdata,
                      struct device_attribute *attributes[], char *name);
 
 int sensors_device_register(struct device **pdev, void *drvdata,
                      struct device_attribute *attributes[], char *name);
-void sensors_unregister(struct device *dev,
+void shub_sensors_unregister(struct device *dev,
                         struct device_attribute *attributes[]);
-void destroy_sensor_class(void);
+void shub_destroy_sensor_class(void);
 
-extern int sensordump_notifier_register(struct notifier_block *nb);
-extern int sensordump_notifier_unregister(struct notifier_block *nb);
-extern int sensordump_notifier_call_chain(unsigned long val, void *v);
+extern int shub_sensordump_notifier_register(struct notifier_block *nb);
+extern int shub_sensordump_notifier_unregister(struct notifier_block *nb);
+extern int shub_sensordump_notifier_call_chain(unsigned long val, void *v);
 
 #endif

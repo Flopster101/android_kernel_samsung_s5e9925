@@ -766,10 +766,10 @@ static struct device_attribute *hiddenhole_attrs[] = {
 
 void initialize_hiddenhole_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->hiddenhole_device, data, hiddenhole_attrs, "hidden_hole");
+	ssp_sensors_register(&data->hiddenhole_device, data, hiddenhole_attrs, "hidden_hole");
 }
 
 void remove_hiddenhole_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->hiddenhole_device, hiddenhole_attrs);
+	ssp_sensors_unregister(data->hiddenhole_device, hiddenhole_attrs);
 }

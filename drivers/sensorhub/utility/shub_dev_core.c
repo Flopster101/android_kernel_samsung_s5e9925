@@ -19,7 +19,7 @@
 #include "../sensorhub/shub_device.h"
 #include <linux/version.h>
 
-extern struct class *sensors_class;
+static struct class *sensors_class;
 
 int sensor_device_create(struct device **pdev, void *drvdata, char *name)
 {
@@ -116,6 +116,6 @@ void remove_sensor_bin_attr(struct device *dev, struct bin_attribute *attributes
 void sensor_device_destroy(struct device *dev)
 {
 	//device_destroy(sensors_class, dev->devt);
-	// device_create �떄 dev_t �넣�줘destroy 못함
+	// device_create �떄 dev_t �넣�줘destroy 못함
 	// need to check again, not probed sensor device have to be destroyed
 }

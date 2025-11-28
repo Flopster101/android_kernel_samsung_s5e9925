@@ -36,41 +36,41 @@
 #define CREATE_CLASS(name) class_create(THIS_MODULE, name);
 #endif
 
-struct class *sensors_class;
-EXPORT_SYMBOL_GPL(sensors_class);
-struct class *sensors_event_class;
-EXPORT_SYMBOL_GPL(sensors_event_class);
+struct class *shub_sensors_class;
+EXPORT_SYMBOL_GPL(shub_sensors_class);
+struct class *shub_sensors_event_class;
+EXPORT_SYMBOL_GPL(shub_sensors_event_class);
 static atomic_t sensor_count;
 static struct device *symlink_dev;
 static struct device *sensor_dev;
 static struct input_dev *meta_input_dev;
 static struct device *ssc_core_dev;
 
-static BLOCKING_NOTIFIER_HEAD(sensordump_notifier_list);
-int sensordump_notifier_register(struct notifier_block *nb)
+static BLOCKING_NOTIFIER_HEAD(shub_sensordump_notifier_list);
+int shub_sensordump_notifier_register(struct notifier_block *nb)
 {
-	return blocking_notifier_chain_register(&sensordump_notifier_list, nb);
+	return blocking_notifier_chain_register(&shub_sensordump_notifier_list, nb);
 }
-EXPORT_SYMBOL(sensordump_notifier_register);
+EXPORT_SYMBOL(shub_sensordump_notifier_register);
 
-int sensordump_notifier_unregister(struct notifier_block *nb)
+int shub_sensordump_notifier_unregister(struct notifier_block *nb)
 {
-	return blocking_notifier_chain_unregister(&sensordump_notifier_list, nb);
+	return blocking_notifier_chain_unregister(&shub_sensordump_notifier_list, nb);
 }
-EXPORT_SYMBOL(sensordump_notifier_unregister);
+EXPORT_SYMBOL(shub_sensordump_notifier_unregister);
 
-int sensordump_notifier_call_chain(unsigned long val, void *v)
+int shub_sensordump_notifier_call_chain(unsigned long val, void *v)
 {
-	return blocking_notifier_call_chain(&sensordump_notifier_list, val, v);
+	return blocking_notifier_call_chain(&shub_sensordump_notifier_list, val, v);
 }
-EXPORT_SYMBOL_GPL(sensordump_notifier_call_chain);
+EXPORT_SYMBOL_GPL(shub_sensordump_notifier_call_chain);
 
 static ssize_t sensor_dump_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
 
 	pr_info("[SENSOR] sensor_dump_show\n");
-	sensordump_notifier_call_chain(1, NULL);
+	shub_sensordump_notifier_call_chain(1, NULL);
 
 	return snprintf(buf, PAGE_SIZE, "SENSOR_DUMP_DONE\n");
 }
@@ -115,7 +115,7 @@ static void set_sensor_attr(struct device *dev,
 			       "(dev, attributes[%d])\n", i);
 }
 
-int sensors_create_symlink(struct input_dev *inputdev)
+int shub_sensors_create_symlink(struct input_dev *inputdev)
 {
 	int err = 0;
 
@@ -134,9 +134,9 @@ int sensors_create_symlink(struct input_dev *inputdev)
 
 	return err;
 }
-EXPORT_SYMBOL_GPL(sensors_create_symlink);
+EXPORT_SYMBOL_GPL(shub_sensors_create_symlink);
 
-void sensors_remove_symlink(struct input_dev *inputdev)
+void shub_sensors_remove_symlink(struct input_dev *inputdev)
 {
 
 	if (symlink_dev == NULL) {
@@ -146,22 +146,22 @@ void sensors_remove_symlink(struct input_dev *inputdev)
 
 	sysfs_remove_link(&symlink_dev->kobj, inputdev->name);
 }
-EXPORT_SYMBOL_GPL(sensors_remove_symlink);
+EXPORT_SYMBOL_GPL(shub_sensors_remove_symlink);
 
-int sensors_register(struct device **pdev, void *drvdata,
+int shub_sensors_register(struct device **pdev, void *drvdata,
                      struct device_attribute *attributes[], char *name)
 {
 	struct device* dev;
 
-	if (!sensors_class) {
-		sensors_class = CREATE_CLASS("sensors");
+	if (!shub_sensors_class) {
+		shub_sensors_class = CREATE_CLASS("sensors");
 
-		if (IS_ERR(sensors_class)) {
-			return PTR_ERR(sensors_class);
+		if (IS_ERR(shub_sensors_class)) {
+			return PTR_ERR(shub_sensors_class);
 		}
 	}
 
-	dev = device_create(sensors_class, NULL, 0, drvdata, "%s", name);
+	dev = device_create(shub_sensors_class, NULL, 0, drvdata, "%s", name);
 
 	if (IS_ERR(dev)) {
 		int ret = PTR_ERR(dev);
@@ -177,9 +177,9 @@ int sensors_register(struct device **pdev, void *drvdata,
 
 	return 0;
 }
-EXPORT_SYMBOL_GPL(sensors_register);
+EXPORT_SYMBOL_GPL(shub_sensors_register);
 
-void sensors_unregister(struct device *dev,
+void shub_sensors_unregister(struct device *dev,
                         struct device_attribute *attributes[])
 {
 	int i;
@@ -188,25 +188,25 @@ void sensors_unregister(struct device *dev,
 		device_remove_file(dev, attributes[i]);
 	}
 }
-EXPORT_SYMBOL_GPL(sensors_unregister);
+EXPORT_SYMBOL_GPL(shub_sensors_unregister);
 
-void destroy_sensor_class(void)
+void shub_destroy_sensor_class(void)
 {
-	if (sensors_class) {
-		device_destroy(sensors_class, sensor_dev->devt);
-		class_destroy(sensors_class);
+	if (shub_sensors_class) {
+		device_destroy(shub_sensors_class, sensor_dev->devt);
+		class_destroy(shub_sensors_class);
 		sensor_dev = NULL;
-		sensors_class = NULL;
+		shub_sensors_class = NULL;
 	}
 
-	if (sensors_event_class) {
-		device_destroy(sensors_event_class, symlink_dev->devt);
-		class_destroy(sensors_event_class);
+	if (shub_sensors_event_class) {
+		device_destroy(shub_sensors_event_class, symlink_dev->devt);
+		class_destroy(shub_sensors_event_class);
 		symlink_dev = NULL;
-		sensors_event_class = NULL;
+		shub_sensors_event_class = NULL;
 	}
 }
-EXPORT_SYMBOL_GPL(destroy_sensor_class);
+EXPORT_SYMBOL_GPL(shub_destroy_sensor_class);
 
 int sensors_meta_input_init(void)
 {
@@ -230,7 +230,7 @@ int sensors_meta_input_init(void)
 		return ret;
 	}
 
-	ret = sensors_create_symlink(meta_input_dev);
+	ret = shub_sensors_create_symlink(meta_input_dev);
 	if (ret < 0) {
 		pr_err("[SENSOR CORE] failed create meta symlink\n");
 		input_unregister_device(meta_input_dev);
@@ -242,7 +242,7 @@ int sensors_meta_input_init(void)
 
 void sensors_meta_input_clean(void)
 {
-	sensors_remove_symlink(meta_input_dev);
+	shub_sensors_remove_symlink(meta_input_dev);
 	input_unregister_device(meta_input_dev);
 }
 
@@ -250,36 +250,36 @@ static int __init sensors_class_init(void)
 {
 	pr_info("[SENSORS CORE] sensors_class_init\n");
 
-	sensors_class = CREATE_CLASS("sensors");
+	shub_sensors_class = CREATE_CLASS("sensors");
 
-	if (IS_ERR(sensors_class)) {
+	if (IS_ERR(shub_sensors_class)) {
 		pr_err("%s, create sensors_class is failed.(err=%d)\n",
-		       __func__, IS_ERR(sensors_class));
-		return PTR_ERR(sensors_class);
+		       __func__, IS_ERR(shub_sensors_class));
+		return PTR_ERR(shub_sensors_class);
 	}
 
 	/* For symbolic link */
-	sensors_event_class = CREATE_CLASS("sensor_event");
+	shub_sensors_event_class = CREATE_CLASS("sensor_event");
 
-	if (IS_ERR(sensors_event_class)) {
+	if (IS_ERR(shub_sensors_event_class)) {
 		pr_err("%s, create sensors_class is failed.(err=%d)\n",
-		       __func__, IS_ERR(sensors_event_class));
-		class_destroy(sensors_class);
-		return PTR_ERR(sensors_event_class);
+		       __func__, IS_ERR(shub_sensors_event_class));
+		class_destroy(shub_sensors_class);
+		return PTR_ERR(shub_sensors_event_class);
 	}
 
-	symlink_dev = device_create(sensors_event_class, NULL, 0, NULL,
+	symlink_dev = device_create(shub_sensors_event_class, NULL, 0, NULL,
 	                            "%s", "symlink");
 	if (IS_ERR(symlink_dev)) {
 		pr_err("[SENSORS CORE] symlink_dev create failed!"\
 		       "[%d]\n", IS_ERR(symlink_dev));
-		class_destroy(sensors_class);
-		class_destroy(sensors_event_class);
+		class_destroy(shub_sensors_class);
+		class_destroy(shub_sensors_event_class);
 		return PTR_ERR(symlink_dev);
 	}
 
 	/* For flush sysfs */
-	sensor_dev = device_create(sensors_class, NULL, 0, NULL,
+	sensor_dev = device_create(shub_sensors_class, NULL, 0, NULL,
 				   "%s", "sensor_dev");
 	if (IS_ERR(sensor_dev)) {
 		pr_err("[SENSORS CORE] sensor_dev create failed![%d]\n",
@@ -289,7 +289,7 @@ static int __init sensors_class_init(void)
 			pr_err("[SENSOR CORE] failed flush device_file\n");
 	}
 
-	ssc_core_dev = device_create(sensors_class, NULL, 0, NULL,
+	ssc_core_dev = device_create(shub_sensors_class, NULL, 0, NULL,
 			"%s", "ssc_core");
 	if (IS_ERR(ssc_core_dev)) {
 		pr_err("[SENSORS CORE] ssc_core_dev create failed![%d]\n",
@@ -300,7 +300,7 @@ static int __init sensors_class_init(void)
 	}
 
 	atomic_set(&sensor_count, 0);
-	sensors_class->dev_uevent = NULL;
+	shub_sensors_class->dev_uevent = NULL;
 	sensors_meta_input_init();
 	pr_info("[SENSORS CORE] sensors_class_init succcess\n");
 
@@ -312,11 +312,11 @@ static void __exit sensors_class_exit(void)
 	if (meta_input_dev)
 		sensors_meta_input_clean();
 
-	if (sensors_class || sensors_event_class) {
-		class_destroy(sensors_class);
-		sensors_class = NULL;
-		class_destroy(sensors_event_class);
-		sensors_event_class = NULL;
+	if (shub_sensors_class || shub_sensors_event_class) {
+		class_destroy(shub_sensors_class);
+		shub_sensors_class = NULL;
+		class_destroy(shub_sensors_event_class);
+		shub_sensors_event_class = NULL;
 	}
 }
 

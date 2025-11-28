@@ -650,10 +650,10 @@ void initialize_magnetic_factorytest(struct ssp_data *data)
     push_back(&mag_manager, "AK09918C", get_mag_ak09918c());
 #endif
     
-	sensors_register(&data->mag_device, data, mag_attrs, "magnetic_sensor");
+	ssp_sensors_register(&data->mag_device, data, mag_attrs, "magnetic_sensor");
 }
 
 void remove_magnetic_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->mag_device, mag_attrs);
+	ssp_sensors_unregister(data->mag_device, mag_attrs);
 }

@@ -4899,9 +4899,9 @@ int tsl2510_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	}
 
 #if IS_ENABLED(CONFIG_ARCH_EXYNOS)
-	err = sensors_create_symlink(data->als_input_dev);
+	err = ssp_sensors_create_symlink(data->als_input_dev);
 #else
-	err = sensors_create_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
+	err = ssp_sensors_create_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
 #endif
 	if (err < 0) {
 		ALS_err("%s - could not create_symlink\n", __func__);
@@ -4914,7 +4914,7 @@ int tsl2510_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto err_sysfs_create_group;
 	}
 
-	err = sensors_register(&data->sensor_dev, data, tsl2510_sensor_attrs, MODULE_NAME_ALS);
+	err = ssp_sensors_register(&data->sensor_dev, data, tsl2510_sensor_attrs, MODULE_NAME_ALS);
 	if (err) {
 		ALS_err("%s - cound not register als_sensor(%d).\n", __func__, err);
 		goto als_sensor_register_failed;
@@ -4967,15 +4967,15 @@ int tsl2510_probe(struct i2c_client *client, const struct i2c_device_id *id)
 dev_set_drvdata_failed:
 	free_irq(data->dev_irq, data);
 err_setup_irq:
-	sensors_unregister(data->sensor_dev, tsl2510_sensor_attrs);
+	ssp_sensors_unregister(data->sensor_dev, tsl2510_sensor_attrs);
 als_sensor_register_failed:
 	sysfs_remove_group(&data->als_input_dev->dev.kobj,
 			&als_attribute_group);
 err_sysfs_create_group:
 #if IS_ENABLED(CONFIG_ARCH_EXYNOS)
-	sensors_remove_symlink(data->als_input_dev);
+	ssp_sensors_remove_symlink(data->als_input_dev);
 #else
-	sensors_remove_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
+	ssp_sensors_remove_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
 #endif
 err_sensors_create_symlink:
 	input_unregister_device(data->als_input_dev);
@@ -5055,12 +5055,12 @@ int tsl2510_remove(struct i2c_client *client)
 		data->regulator_vdd_1p8 = NULL;
 	}
 
-	sensors_unregister(data->sensor_dev, tsl2510_sensor_attrs);
+	ssp_sensors_unregister(data->sensor_dev, tsl2510_sensor_attrs);
 	sysfs_remove_group(&data->als_input_dev->dev.kobj, &als_attribute_group);
 #if IS_ENABLED(CONFIG_ARCH_EXYNOS)
-	sensors_remove_symlink(data->als_input_dev);
+	ssp_sensors_remove_symlink(data->als_input_dev);
 #else
-	sensors_remove_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
+	ssp_sensors_remove_symlink(&data->als_input_dev->dev.kobj, data->als_input_dev->name);
 #endif
 	input_unregister_device(data->als_input_dev);
 

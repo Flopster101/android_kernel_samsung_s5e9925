@@ -423,11 +423,11 @@ static struct device_attribute *acc_attrs[] = {
 
 void initialize_accel_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->acc_device, data, acc_attrs,
+	ssp_sensors_register(&data->acc_device, data, acc_attrs,
 		"accelerometer_sensor");
 }
 
 void remove_accel_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->acc_device, acc_attrs);
+	ssp_sensors_unregister(data->acc_device, acc_attrs);
 }

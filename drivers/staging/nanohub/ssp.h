@@ -531,7 +531,7 @@ struct sensor_value {
 	u64 timestamp;
 } __attribute__((__packed__));
 
-extern struct class *sensors_event_class;
+extern struct class *ssp_sensors_event_class;
 
 struct calibraion_data {
 	s32 x;
@@ -886,9 +886,9 @@ void remove_thremistor_factorytest(struct ssp_data *data);
 void remove_magnetic_factorytest(struct ssp_data *data);
 void remove_fcd_factorytest(struct ssp_data *data);
 
-void sensors_remove_symlink(struct input_dev *inputdev);
-void destroy_sensor_class(void);
-int sensors_create_symlink(struct input_dev *inputdev);
+void ssp_sensors_remove_symlink(struct input_dev *inputdev);
+void ssp_destroy_sensor_class(void);
+int ssp_sensors_create_symlink(struct input_dev *inputdev);
 int accel_open_calibration(struct ssp_data *data);
 int gyro_open_calibration(struct ssp_data *data);
 int pressure_open_calibration(struct ssp_data *data);
@@ -953,9 +953,9 @@ void report_mcu_ready(struct ssp_data *data);
 int print_mcu_debug(char *pchRcvDataFrame, int *pDataIdx, int iRcvDataFrameLength);
 
 void reset_mcu(struct ssp_data *data);
-int sensors_register(struct device **pdev, void *drvdata,
+int ssp_sensors_register(struct device **pdev, void *drvdata,
 	struct device_attribute *attributes[], char *name);
-void sensors_unregister(struct device *dev,
+void ssp_sensors_unregister(struct device *dev,
 	struct device_attribute *attributes[]);
 ssize_t mcu_reset_show(struct device *dev, struct device_attribute *attr, char *buf);
 bool mcu_reset_by_msg(struct ssp_data *data);

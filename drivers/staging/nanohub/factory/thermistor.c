@@ -257,10 +257,10 @@ static struct device_attribute *thermistor_attrs[] = {
 
 void initialize_thermistor_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->thermistor_device, data, thermistor_attrs, "thermistor_sensor");
+	ssp_sensors_register(&data->thermistor_device, data, thermistor_attrs, "thermistor_sensor");
 }
 
 void remove_thremistor_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->thermistor_device, thermistor_attrs);
+	ssp_sensors_unregister(data->thermistor_device, thermistor_attrs);
 }

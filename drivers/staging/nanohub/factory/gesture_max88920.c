@@ -133,11 +133,11 @@ static struct device_attribute *gesture_attrs[] = {
 
 void initialize_gesture_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->ges_device, data,
+	ssp_sensors_register(&data->ges_device, data,
 		gesture_attrs, "gesture_sensor");
 }
 
 void remove_gesture_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->ges_device, gesture_attrs);
+	ssp_sensors_unregister(data->ges_device, gesture_attrs);
 }

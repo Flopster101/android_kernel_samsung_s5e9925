@@ -32,8 +32,14 @@
 #define TIME_HI_MASK 0xFFFFFFFF00000000
 #define TIME_HI_SHIFT 32
 #include <linux/alarmtimer.h>
+#include <linux/input.h>
+#include <linux/device.h>
 
-extern int sensordump_notifier_register(struct notifier_block *nb);
-extern int sensordump_notifier_unregister(struct notifier_block *nb);
-extern int sensordump_notifier_call_chain(unsigned long val, void *v);
+extern int ssp_sensordump_notifier_register(struct notifier_block *nb);
+extern int ssp_sensordump_notifier_unregister(struct notifier_block *nb);
+extern int ssp_sensordump_notifier_call_chain(unsigned long val, void *v);
+extern int ssp_sensors_register(struct device **pdev, void *drvdata, struct device_attribute *attributes[], char *name);
+extern void ssp_sensors_unregister(struct device *dev, struct device_attribute *attributes[]);
+extern int ssp_sensors_create_symlink(struct input_dev *inputdev);
+extern void ssp_sensors_remove_symlink(struct input_dev *inputdev);
 #endif

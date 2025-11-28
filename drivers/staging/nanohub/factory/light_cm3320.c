@@ -68,10 +68,10 @@ static struct device_attribute *light_attrs[] = {
 
 void initialize_light_factorytest(struct ssp_data *data)
 {
-	sensors_register(&data->light_device, data, light_attrs, "light_sensor");
+	ssp_sensors_register(&data->light_device, data, light_attrs, "light_sensor");
 }
 
 void remove_light_factorytest(struct ssp_data *data)
 {
-	sensors_unregister(data->light_device, light_attrs);
+	ssp_sensors_unregister(data->light_device, light_attrs);
 }

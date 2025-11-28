@@ -531,7 +531,7 @@ void initialize_temphumidity_factorytest(struct ssp_data *data)
 		pr_err("%s, fail to register pam-temp-adc(%ld)\n",
 			__func__, IS_ERR(data->adc_client));
 #endif
-	sensors_register(&data->temphumidity_device,
+	ssp_sensors_register(&data->temphumidity_device,
 		data, temphumidity_attrs, "temphumidity_sensor");
 
 	data->shtc1_device.minor = MISC_DYNAMIC_MINOR;
@@ -551,7 +551,7 @@ void remove_temphumidity_factorytest(struct ssp_data *data)
 #endif
 	if (data->pdev_pam_temp)
 		platform_device_put(data->pdev_pam_temp);
-	sensors_unregister(data->temphumidity_device, temphumidity_attrs);
+	ssp_sensors_unregister(data->temphumidity_device, temphumidity_attrs);
 	kfree(data->comp_engine_ver);
 	ssp_temphumidity_fops.unlocked_ioctl = NULL;
 	misc_deregister(&data->shtc1_device);

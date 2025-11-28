@@ -3371,7 +3371,7 @@ static int isg6320_probe(struct i2c_client *client,
 		goto err_register_input_dev_noti;
 	}
 #if defined(CONFIG_SENSORS_CORE_AP)
-	ret = sensors_create_symlink(&input_dev->dev.kobj,
+	ret = ssp_sensors_create_symlink(&input_dev->dev.kobj,
 					 input_dev->name);
 	if (ret < 0) {
 		pr_err("[GRIP_%d] fail to create symlink %d\n", data->ic_num, ret);
@@ -3396,10 +3396,10 @@ static int isg6320_probe(struct i2c_client *client,
 		}
 		memcpy(grip_sensor_attrs + sensor_attrs_size - 1, multi_sensor_attrs, sizeof(multi_sensor_attrs));
 	}
-	ret = sensors_register(&data->dev, data, grip_sensor_attrs,
+	ret = ssp_sensors_register(&data->dev, data, grip_sensor_attrs,
 				(char *)module_name[data->ic_num]);
 #else
-	ret = sensors_register(&data->dev, data, sensor_attrs,
+	ret = ssp_sensors_register(&data->dev, data, sensor_attrs,
 				(char *)module_name[data->ic_num]);
 #endif
 
@@ -3408,7 +3408,7 @@ static int isg6320_probe(struct i2c_client *client,
 		goto err_sensor_register;
 	}
 #else //!CONFIG_SENSORS_CORE_AP
-	ret = sensors_create_symlink(input_dev);
+	ret = ssp_sensors_create_symlink(input_dev);
 	if (ret < 0) {
 		pr_err("[GRIP_%d] fail to create symlink %d\n", data->ic_num, ret);
 		goto err_create_symlink;
@@ -3433,10 +3433,10 @@ static int isg6320_probe(struct i2c_client *client,
 		memcpy(grip_sensor_attrs + sensor_attrs_size - 1, multi_sensor_attrs, sizeof(multi_sensor_attrs));
 	}
 
-	ret = sensors_register(&data->dev, data, grip_sensor_attrs,
+	ret = ssp_sensors_register(&data->dev, data, grip_sensor_attrs,
 				(char *)module_name[data->ic_num]);
 #else
-	ret = sensors_register(&data->dev, data, sensor_attrs,
+	ret = ssp_sensors_register(&data->dev, data, sensor_attrs,
 				(char *)module_name[data->ic_num]);
 #endif
 	if (ret) {
@@ -3490,7 +3490,7 @@ static int isg6320_probe(struct i2c_client *client,
 	data->dump_nb.priority = 1;
 	{
 		int ret;
-		ret = sensordump_notifier_register(&data->dump_nb);
+		ret = ssp_sensordump_notifier_register(&data->dump_nb);
 		pr_info("[GRIP_%d] notifier %d", data->ic_num, ret);
 	}
 
@@ -3503,9 +3503,9 @@ err_sensor_register:
 	sysfs_remove_group(&input_dev->dev.kobj, &isg6320_attribute_group);
 err_sysfs_create_group:
 #if defined(CONFIG_SENSORS_CORE_AP)
-	sensors_remove_symlink(&data->input_dev->dev.kobj, data->input_dev->name);
+	ssp_sensors_remove_symlink(&data->input_dev->dev.kobj, data->input_dev->name);
 #else
-	sensors_remove_symlink(input_dev);
+	ssp_sensors_remove_symlink(input_dev);
 #endif
 err_create_symlink:
 	input_unregister_device(noti_input_dev);
@@ -3547,11 +3547,11 @@ static int isg6320_remove(struct i2c_client *client)
 	gpio_free(data->gpio_int);
 
 	wakeup_source_unregister(data->grip_ws);
-	sensors_unregister(data->dev, sensor_attrs);
+	ssp_sensors_unregister(data->dev, sensor_attrs);
 #if defined(CONFIG_SENSORS_CORE_AP)
-	sensors_remove_symlink(&data->input_dev->dev.kobj, data->input_dev->name);
+	ssp_sensors_remove_symlink(&data->input_dev->dev.kobj, data->input_dev->name);
 #else
-	sensors_remove_symlink(data->input_dev);
+	ssp_sensors_remove_symlink(data->input_dev);
 #endif
 	sysfs_remove_group(&data->input_dev->dev.kobj, &isg6320_attribute_group);
 	input_unregister_device(data->noti_input_dev);
