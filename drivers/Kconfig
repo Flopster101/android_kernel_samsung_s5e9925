@@ -292,6 +292,7 @@ source "drivers/battery/wireless/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT 
 source "drivers/phy/ti/tusb2e11/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/mfd/maxim/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/vibrator/cs/cs40l26/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
+source "drivers/vibrator/awinic/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/uwb/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/battery/common/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
 source "drivers/input/wacom/Kconfig" # ADDED BY LEGO AUTOMATICALLY: DO NOT SUBMIT
